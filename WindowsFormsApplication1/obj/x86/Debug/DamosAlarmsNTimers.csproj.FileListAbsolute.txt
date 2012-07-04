@@ -1,0 +1,18 @@
+C:\Users\RohypnolLarry\Documents\Visual Studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\Users\RohypnolLarry\Documents\Visual Studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\Users\RohypnolLarry\Documents\Visual Studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\RohypnolLarry\Documents\Visual Studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.frmDamoANTs.resources
+C:\Users\RohypnolLarry\Documents\Visual Studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\RohypnolLarry\Documents\Visual Studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\RohypnolLarry\Documents\Visual Studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\RohypnolLarry\Documents\Visual Studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\Users\RohypnolLarry\Documents\Visual Studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\Users\Rohypnol Larry\Desktop\src\DANT\WindowsFormsApplication1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Rohypnol Larry\Desktop\src\DANT\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.frmDamoANTs.resources
+C:\Users\Rohypnol Larry\Desktop\src\DANT\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Rohypnol Larry\Desktop\src\DANT\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Rohypnol Larry\Desktop\src\DANT\WindowsFormsApplication1\bin\Debug\DamosAlarmsNTimers.exe
+C:\Users\Rohypnol Larry\Desktop\src\DANT\WindowsFormsApplication1\bin\Debug\DamosAlarmsNTimers.pdb
+C:\Users\Rohypnol Larry\Desktop\src\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.Properties.Resources.resources
+C:\Users\Rohypnol Larry\Desktop\src\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.exe
+C:\Users\Rohypnol Larry\Desktop\src\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.pdb
