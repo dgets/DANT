@@ -17,6 +17,7 @@ using System.IO;
  *   the alarm is activated in order to fix this problem.
  * * More than one active alarm fucks things up; only one alarm can run at a
  *   time, although more than one can now be successfully checked.
+ * * Checking 2nd alarm doesn't work.
  */
 
 namespace WindowsFormsApplication1
@@ -29,24 +30,20 @@ namespace WindowsFormsApplication1
         private const String cfgFile = 
             @"\Users\Rohypnol Larry\Desktop\DANT.cfg";
 
-        public frmDamoANTs()
-        {
+        public frmDamoANTs() {
             InitializeComponent();
-            if (!loadAlarmsTimers())
-            {
+            if (!loadAlarmsTimers()) {
                 MessageBox.Show("Issues loading saved alarms & timers!");
             }
         }
 
-        private void btnAddAlarm_Click(object sender, EventArgs e)
-        {
+        private void btnAddAlarm_Click(object sender, EventArgs e) {
             AlarmsTimers tmpAlarm = new AlarmsTimers();
             
             //verify that numericUpDown selectors are not at 0,0,0
             if ((numAlarmHr.Value == 0) && 
                 (numAlarmMin.Value == 0) &&
-                (numAlarmSec.Value == 0))
-            {
+                (numAlarmSec.Value == 0)) {
                 //bogus entry
                 Console.WriteLine("You must enter a valid time for the " +
                     "alarm to go off!");
@@ -54,8 +51,7 @@ namespace WindowsFormsApplication1
             }
 
             //verify that name box is not still full of default value
-            if (txtAlarmName.Text.CompareTo("Alarm Name Here") == 0)
-            {
+            if (txtAlarmName.Text.CompareTo("Alarm Name Here") == 0) {
                 Console.WriteLine("You must enter a valid name for the " +
                     "alarm that you are setting!");
                 return;
@@ -108,26 +104,20 @@ namespace WindowsFormsApplication1
             System.IO.StreamWriter cFile = 
                 new System.IO.StreamWriter(cfgFile);
 
-            if (debugging)
-            {
+            if (debugging) {
                 Console.WriteLine("Opened " + cfgFile + " for writing");
             }
 
             for (int cntr = 0; cntr < activeAls.Count(); cntr++) {
-                if (debugging)
-                {
+                if (debugging) {
                     Console.WriteLine("Adding activeAls[" + cntr.ToString() +
                         "] to save file . . .");
-                }
-                try
-                {
+                } try {
                     cFile.WriteLine("A," + activeAls[cntr].name + "," +
                         activeAls[cntr].target.Hour + "," + 
                         activeAls[cntr].target.Minute + "," +
                         activeAls[cntr].target.Second);
-                }
-                catch
-                {
+                } catch {
                     Console.WriteLine("Error adding activeAls[" +
                         cntr.ToString() + "]!");
                 }
@@ -136,8 +126,7 @@ namespace WindowsFormsApplication1
             return true;
         }
 
-        private Boolean loadAlarmsTimers()
-        {
+        private Boolean loadAlarmsTimers() {
             if (!File.Exists(cfgFile)) {
                 if (debugging) {
                     Console.WriteLine("Empty or nonexistant config file " +
@@ -149,20 +138,16 @@ namespace WindowsFormsApplication1
             String[] rawFile;
             int cntr = 0;
 
-            try
-            {
+            try {
                 //no need to close after ReadAllLines()
                 rawFile = System.IO.File.ReadAllLines(cfgFile);
-            }
-            catch
-            {
+            } catch {
                 MessageBox.Show("There was an error reading " + cfgFile +
                     ", aborting.");
                 return false;
             }
 
-            foreach (String raw in rawFile)
-            {
+            foreach (String raw in rawFile) {
                 String[] rawFields;
                 //DateTime tmpTime;
                 int tmpHr, tmpMin, tmpSec;
@@ -170,31 +155,25 @@ namespace WindowsFormsApplication1
                 AlarmsTimers tmpAlarm = new AlarmsTimers();
 
                 rawFields = raw.Split(',');
-                if (rawFields.Count() != 5)
-                {
+                if (rawFields.Count() != 5) {
                     //error in the textfile
                     MessageBox.Show("Error parsing " + cfgFile +
                         "; please check what the hell is going on and try " +
                         "again later :)");
                     break;
                 }
-                if (rawFields[0] == "A")
-                {
+                if (rawFields[0] == "A") {
                     //We're dealing with an alarm
-                    if (!Int32.TryParse(rawFields[2], out tmpHr))
-                    {
+                    if (!Int32.TryParse(rawFields[2], out tmpHr)) {
                         tmpFlag = true;
                     }
-                    if (!Int32.TryParse(rawFields[3], out tmpMin))
-                    {
+                    if (!Int32.TryParse(rawFields[3], out tmpMin)) {
                         tmpFlag = true;
                     }
-                    if (!Int32.TryParse(rawFields[4], out tmpSec))
-                    {
+                    if (!Int32.TryParse(rawFields[4], out tmpSec)) {
                         tmpFlag = true;
                     }
-                    if (tmpFlag)
-                    {
+                    if (tmpFlag) {
                         MessageBox.Show("There was an error trying to parse " +
                             "one of the fields in " + cfgFile + "\nPlease " +
                             "try to find out what the hell is going on and " +
@@ -207,31 +186,25 @@ namespace WindowsFormsApplication1
                     tmpAlarm.running = false;
                     tmpFlag = false;
 
-                    if (tmpHr < DateTime.Now.Hour)
-                    {
+                    if (tmpHr < DateTime.Now.Hour) {
                         tmpFlag = true;
                     }
                     else if ((tmpHr == DateTime.Now.Hour) &&
-                      (tmpMin < DateTime.Now.Minute))
-                    {
+                      (tmpMin < DateTime.Now.Minute)) {
                         tmpFlag = true;
                     }
                     else if ((tmpHr == DateTime.Now.Hour) &&
                       (tmpMin == DateTime.Now.Minute) &&
-                      (tmpSec < DateTime.Now.Second))
-                    {
+                      (tmpSec < DateTime.Now.Second)) {
                         tmpFlag = true;
                     }
-                    if (tmpFlag)
-                    {
+                    if (tmpFlag) {
                         tmpAlarm.target =
                             new DateTime(DateTime.Now.AddDays(1).Year,
                                 DateTime.Now.AddDays(1).Month,
                                 DateTime.Now.AddDays(1).Day, tmpHr,
                                 tmpMin, tmpSec);
-                    }
-                    else
-                    {
+                    } else {
                         tmpAlarm.target =
                             new DateTime(DateTime.Now.Year,
                                 DateTime.Now.Month,
@@ -243,9 +216,7 @@ namespace WindowsFormsApplication1
                     //(see hint in BUGS at the top of the code)
                     activeAls.Add(tmpAlarm);
                     addAlarm(cntr++);
-                }
-                else
-                {
+                } else {
                     //we're working with a timer here (add code later)
                 }
             }
@@ -253,8 +224,7 @@ namespace WindowsFormsApplication1
             return true;
         }
 
-        private void addAlarm(int alarmNo)
-        {
+        private void addAlarm(int alarmNo) {
             //need to add code to verify that we aren't adding the same name more than
             //once as that is how we are going to be identifying specific instances
             //ACTUALLY this should be moot as they'll be indexed by # in the list
@@ -282,28 +252,23 @@ namespace WindowsFormsApplication1
             //note alarm will not be running at this point; just add it to the chkboxlist
             chklstAlarms.Items.Insert(alarmNo, (activeAls.ElementAt(alarmNo).name + " -> " +
                 tmpHr + ":" + tmpMin + ":" + tmpSec));
-
         }
 
         /*  --==** ALARM/TIMER CLASS **==-- */
-        public partial class AlarmsTimers
-        {
+        public partial class AlarmsTimers {
             public String name;
             public DateTime target;
             private TimeSpan interval;
             public Boolean running;
 
             //method correctly sets interval for an alarm
-            public void autoSetInterval()
-            {
+            public void autoSetInterval() {
                 interval = target - DateTime.Now;
             }
 
             //method determines whether alarm/timer is 'firing' or not
-            public Boolean checkIfFiring()
-            {
-                if (debugging)
-                {
+            public Boolean checkIfFiring() {
+                if (debugging) {
                     Console.WriteLine("Checking if firing\nRunning value for: " +
                         name + " is: " + running.ToString() + "\nSeconds " +
                         "left: " + interval.TotalSeconds.ToString() + "\n" +
@@ -311,16 +276,13 @@ namespace WindowsFormsApplication1
                 }
 
                 if ((interval.TotalSeconds < 1) &&
-                    (interval.TotalSeconds > -1))
-                {
+                    (interval.TotalSeconds > -1)) {
                     //firing
                     //MessageBox.Show("Ring ring, Neo.");
                     //add other firing code here
                     running = false;
                     return true;
-                }
-                else
-                {
+                } else {
                     return false;
                 }
             }
@@ -348,50 +310,34 @@ namespace WindowsFormsApplication1
             }
         }
 
-        private void chklstAlarms_CheckedChanged(object sender, ItemCheckEventArgs e)
-        {
-            if (debugging)
-            {
+        private void chklstAlarms_CheckedChanged(object sender, ItemCheckEventArgs e) {
+            if (debugging) {
                 Console.WriteLine("activeAls.Count: " + activeAls.Count.ToString() +
                     "e.Index: " + e.Index.ToString() + "e.NewValue.ToString(): " +
                     e.NewValue.ToString());
             }
-            for (int cntr = 0; cntr < activeAls.Count; cntr++)
-            {
-                if ((e.Index == cntr) && (e.NewValue == CheckState.Checked))
-                {
-                    if (debugging)
-                    {
-                        Console.WriteLine(e.NewValue.ToString());
-                    }
-                    if (activeAls.ElementAt(cntr).running == false) {
-                        activeAls.ElementAt(cntr).running = true;
-                        if (tmrOneSec.Enabled == false) {
-                            tmrOneSec.Enabled = true;
-                            tmrOneSec.Start();
-                            //noneRunning = false;
-                        }
-                    }
-                }
-                else if ((e.Index == cntr) && (e.NewValue == CheckState.Unchecked))
-                {
-                    if (activeAls.ElementAt(cntr).running == true)
-                    {
-                        activeAls.ElementAt(cntr).running = false;
-                    }
-                }
-            }
-
         }
 
         private void tmrOneSec_Tick(object sender, EventArgs e) {
             //alarms
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
+                if (!chklstAlarms.GetItemChecked(cntr)) {
+                    activeAls.ElementAt(cntr).running = false;
+                    chklstAlarms.Items.RemoveAt(cntr);
+                    chklstAlarms.Items.Insert(cntr,
+                        (activeAls.ElementAt(cntr).name + " -> " +
+                        activeAls.ElementAt(cntr).target.Hour + ":" +
+                        activeAls.ElementAt(cntr).target.Minute +
+                        ":" + activeAls.ElementAt(cntr).target.Second));
+                }
+
                 //presume this is running
                 if (activeAls.ElementAt(cntr).running == true) {
                     activeAls.ElementAt(cntr).autoSetInterval();
 
                     //update the display
+                    //this is also where freshly unchecked items are
+                    //rechecked :(
                     chklstAlarms.Items.RemoveAt(cntr);
                     chklstAlarms.Items.Insert(cntr, 
                         activeAls.ElementAt(cntr).name + ": Remaining: " +
@@ -413,31 +359,27 @@ namespace WindowsFormsApplication1
             }
         }
 
-        private void chklstAlarms_SelectedIndexChanged(object sender, EventArgs e)
-        {
+        private void chklstAlarms_SelectedIndexChanged(object sender, EventArgs e) {
             //this works beautifully
             this.BeginInvoke(new MethodInvoker(checkActiveAlarms), null);
         }
 
-        private void checkActiveAlarms()
-        {
+        private void checkActiveAlarms() {
             //going to need something here to check the unchecked ones, too, to see if
             //anything has stopped running :|
-            if (debugging)
-            {
+            if (debugging) {
                 Console.WriteLine("Firing chklstAlarms_Clicked");
             }
 
-            foreach (int temp in chklstAlarms.CheckedIndices)
-            {
+            foreach (int temp in chklstAlarms.CheckedIndices) {
                 //these are specifically checked, so double checking that in the
                 //conditional should not be necessary
                 if (activeAls.ElementAt(temp).running != true) {
-                    if (debugging)
-                    {
+                    if (debugging) {
                         Console.WriteLine("Flagged #" + temp.ToString());
                     }
 
+                    //enable timer if it hasn't been handled already
                     if (tmrOneSec.Enabled == false) {
                         activeAls.ElementAt(temp).running = true;
                         tmrOneSec.Enabled = true;
@@ -445,48 +387,34 @@ namespace WindowsFormsApplication1
                     }
                 }
             }
-
         }
 
-        private void txtAlarmName_Enter(object sender, EventArgs e)
-        {
-            if (txtAlarmName.Text.CompareTo("Alarm Name Here") == 0)
-            {
+        private void txtAlarmName_Enter(object sender, EventArgs e) {
+            if (txtAlarmName.Text.CompareTo("Alarm Name Here") == 0) {
                 txtAlarmName.Text = "";
                 txtAlarmName.ForeColor = System.Drawing.SystemColors.WindowText;
             }
         }
 
-        private void txtTimerName_Enter(object sender, EventArgs e)
-        {
-            if (txtTimerName.Text.CompareTo("Timer Name Here") == 0)
-            {
+        private void txtTimerName_Enter(object sender, EventArgs e) {
+            if (txtTimerName.Text.CompareTo("Timer Name Here") == 0) {
                 txtTimerName.Text = "";
                 txtAlarmName.ForeColor = System.Drawing.SystemColors.WindowText;
             }
         }
 
-        private void txtAlarmName_Leave(object sender, EventArgs e)
-        {
-            if (txtAlarmName.Text.CompareTo("") == 0)
-            {
+        private void txtAlarmName_Leave(object sender, EventArgs e) {
+            if (txtAlarmName.Text.CompareTo("") == 0) {
                 txtAlarmName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
                 txtAlarmName.Text = "Alarm Name Here";
             }
         }
 
-        private void txtTimerName_Leave(object sender, EventArgs e)
-        {
-            if (txtTimerName.Text.CompareTo("") == 0)
-            {
+        private void txtTimerName_Leave(object sender, EventArgs e) {
+            if (txtTimerName.Text.CompareTo("") == 0) {
                 txtTimerName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
                 txtTimerName.Text = "Timer Name Here";
             }
         }
-
-        private void btnAddTimer_Click(object sender, EventArgs e) {
-
-        }
-
     }
 }
