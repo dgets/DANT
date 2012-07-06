@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Media;
 
 /*
  * BUGS:
@@ -15,8 +16,16 @@ using System.IO;
  *   will cause the target date to be in the past, and thus bogus.  Time needs 
  *   to be saved just as the hours, minutes, seconds, and calculated only when 
  *   the alarm is activated in order to fix this problem.
- * * Checking any alarm after the 1st one that is checked doesn't work.
- * * After adding an alarm, the new 'Alarm Name Here' text is not grayed out.
+ * * Remove alarm button is not implemented yet.
+ * * Timers section is not implemented yet.
+ * * Alarm sounds are partially implemented; the chooser works, but the files
+ *   have to be a simple wav file, nothing complex, and they are not
+ *   implemented in the loading or saving of config data; it is all commented
+ *   out right now because SimpleSound is a bunch of crap and can't play any
+ *   decent sound files even in .wav containers; it's implemented as a beep
+ *   right now
+ * * 'beep' is not played until the form receives a click or the 'ring ring
+ *   neo' dialog is closed; needs to be repeated UNTIL the dialog is closed
  */
 
 namespace WindowsFormsApplication1
@@ -26,11 +35,20 @@ namespace WindowsFormsApplication1
         public List<AlarmsTimers> activeAls = new List<AlarmsTimers>();
         public List<AlarmsTimers> activeTms = new List<AlarmsTimers>();
         private const Boolean debugging = true;
-        private const String cfgFile = 
-            @"\Users\Khelair\Desktop\DANT.cfg";
+        private String cfgFile;
 
-        public frmDamoANTs() {
+        public frmDamoANTs() { 
+            String ouah;
+
+            //I don't know why this has to be done in such a lame manner
+            //my guess is that the compiler would handle it but Visual Studio
+            //is being stupid
+            ouah = System.Environment.GetFolderPath(
+                Environment.SpecialFolder.Personal) + "\\DANT.cfg";
+            cfgFile = ouah;
+
             InitializeComponent();
+
             if (!loadAlarmsTimers()) {
                 MessageBox.Show("Issues loading saved alarms & timers!");
             }
@@ -86,7 +104,14 @@ namespace WindowsFormsApplication1
 
         private void btnAddAlarm_Click(object sender, EventArgs e) {
             AlarmsTimers tmpAlarm = new AlarmsTimers();
-            
+
+            /* DialogResult whatev = openSoundFile.ShowDialog();
+            while (whatev != DialogResult.OK) {
+                whatev = openSoundFile.ShowDialog();
+            }
+
+            tmpAlarm.soundBite = openSoundFile.FileName; */
+
             //verify that numericUpDown selectors are not at 0,0,0
             if (!verifyLegitTime(true)) {
                 return;
@@ -104,6 +129,7 @@ namespace WindowsFormsApplication1
             tmpAlarm.name = txtAlarmName.Text;
 
             //reset textbox & numericUpDowns
+            txtAlarmName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
             txtAlarmName.Text = "Alarm Name Here";
             numAlarmHr.Value = 0; numAlarmMin.Value = 0; numAlarmSec.Value = 0;
 
@@ -300,6 +326,7 @@ namespace WindowsFormsApplication1
             public DateTime target;
             private TimeSpan interval;
             public Boolean running;
+            //public String soundBite;
 
             //method correctly sets interval for an alarm
             public void autoSetInterval() {
@@ -317,9 +344,6 @@ namespace WindowsFormsApplication1
 
                 if ((interval.TotalSeconds < 1) &&
                     (interval.TotalSeconds > -1)) {
-                    //firing
-                    //MessageBox.Show("Ring ring, Neo.");
-                    //add other firing code here
                     running = false;
                     return true;
                 } else {
@@ -397,6 +421,11 @@ namespace WindowsFormsApplication1
                         tmrOneSec.Enabled = false;
                         tmrOneSec.Stop();
                         MessageBox.Show("Ring ring, Neo.");
+                        /* SoundPlayer alarmSound =
+                            new SoundPlayer(
+                                activeAls.ElementAt(cntr).soundBite);
+                        alarmSound.Play(); */
+                        SystemSounds.Beep.Play();
                         addAlarm(cntr);
                     }
                 }
