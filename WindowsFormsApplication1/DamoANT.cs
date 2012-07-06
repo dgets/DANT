@@ -15,9 +15,8 @@ using System.IO;
  *   will cause the target date to be in the past, and thus bogus.  Time needs 
  *   to be saved just as the hours, minutes, seconds, and calculated only when 
  *   the alarm is activated in order to fix this problem.
- * * More than one active alarm fucks things up; only one alarm can run at a
- *   time, although more than one can now be successfully checked.
  * * Checking any alarm after the 1st one that is checked doesn't work.
+ * * After adding an alarm, the new 'Alarm Name Here' text is not grayed out.
  */
 
 namespace WindowsFormsApplication1
@@ -28,7 +27,7 @@ namespace WindowsFormsApplication1
         public List<AlarmsTimers> activeTms = new List<AlarmsTimers>();
         private const Boolean debugging = true;
         private const String cfgFile = 
-            @"\Users\Rohypnol Larry\Desktop\DANT.cfg";
+            @"\Users\Khelair\Desktop\DANT.cfg";
 
         public frmDamoANTs() {
             InitializeComponent();
@@ -103,7 +102,6 @@ namespace WindowsFormsApplication1
             //check to see if alarm is for tomorrow, set other options
             tmpAlarm.target = checkAlarmDay();
             tmpAlarm.name = txtAlarmName.Text;
-            //tmpAlarm.running = true;  //wut? bug?
 
             //reset textbox & numericUpDowns
             txtAlarmName.Text = "Alarm Name Here";
@@ -238,9 +236,7 @@ namespace WindowsFormsApplication1
 
             foreach (String raw in rawFile) {
                 String[] rawFields;
-                //DateTime tmpTime;
                 int[] tmpTimeData;
-                //Boolean tmpFlag = false;
                 AlarmsTimers tmpAlarm = new AlarmsTimers();
 
                 rawFields = parseSavedFieldsLine(raw);
@@ -273,10 +269,6 @@ namespace WindowsFormsApplication1
         }
 
         private void addAlarm(int alarmNo) {
-            //need to add code to verify that we aren't adding the same name more than
-            //once as that is how we are going to be identifying specific instances
-            //ACTUALLY this should be moot as they'll be indexed by # in the list
-
             String tmpHr, tmpMin, tmpSec;
             //there has really got to be simpler formatting methods to handle this shit
             if (activeAls.ElementAt(alarmNo).target.Hour < 10) {
@@ -370,6 +362,10 @@ namespace WindowsFormsApplication1
             //alarms
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
                 if (!chklstAlarms.GetItemChecked(cntr)) {
+                    if (debugging) {
+                        Console.WriteLine("Non-Active Alarm #" +
+                            cntr.ToString() + " being unset");
+                    }
                     activeAls.ElementAt(cntr).running = false;
                     chklstAlarms.Items.RemoveAt(cntr);
                     chklstAlarms.Items.Insert(cntr,
@@ -380,17 +376,17 @@ namespace WindowsFormsApplication1
                 }
 
                 //presume this is running
-                if (activeAls.ElementAt(cntr).running == true) {
+                //if (activeAls.ElementAt(cntr).running == true) {
+                if (chklstAlarms.GetItemChecked(cntr)) {
+                    activeAls.ElementAt(cntr).running = true;
                     activeAls.ElementAt(cntr).autoSetInterval();
 
                     //update the display
-                    //this is also where freshly unchecked items are
-                    //rechecked :(
                     chklstAlarms.Items.RemoveAt(cntr);
                     chklstAlarms.Items.Insert(cntr, 
                         activeAls.ElementAt(cntr).name + ": Remaining: " +
                         activeAls.ElementAt(cntr).returnCountdown());
-                    chklstAlarms.SetItemChecked(cntr, true);
+                    chklstAlarms.SetItemChecked(cntr, true);    //necessary?
 
                     if (activeAls.ElementAt(cntr).checkIfFiring()) {
                         if (debugging) {
