@@ -17,7 +17,7 @@ using System.IO;
  *   the alarm is activated in order to fix this problem.
  * * More than one active alarm fucks things up; only one alarm can run at a
  *   time, although more than one can now be successfully checked.
- * * Checking 2nd alarm doesn't work.
+ * * Checking any alarm after the 1st one that is checked doesn't work.
  */
 
 namespace WindowsFormsApplication1
@@ -37,64 +37,83 @@ namespace WindowsFormsApplication1
             }
         }
 
+        private Boolean verifyLegitTime(Boolean alarmOrTimer) {
+            //note this method will be passed a T to check alarm data, F to
+            //check timer data (evil, but I'm not sure how to do it better)
+            if (alarmOrTimer) {
+                //alarm
+                if ((numAlarmHr.Value == 0) && (numAlarmMin.Value == 0) &&
+                    (numAlarmSec.Value == 0)) {
+                    //bogus alarm entry
+                    MessageBox.Show("You must enter a valid time for the " +
+                        "alarm to go off!");
+                    return false;
+                }
+            } else {
+                //timer
+                if ((numTimerHr.Value == 0) && (numTimerMin.Value == 0) &&
+                    (numTimerSec.Value == 0)) {
+                    //bogus timer entry
+                    MessageBox.Show("You must enter a valid duration for " +
+                        "the timer to go off!");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private DateTime checkAlarmDay() {
+            //check to see if alarm is for tomorrow
+            //goddamn this needs to be refactored to just utilize the
+            //hr/min/sec data and ditch the date
+            if ((DateTime.Now >=
+                 new DateTime(DateTime.Now.Year, DateTime.Now.Month,
+                              DateTime.Now.Day, (int)numAlarmHr.Value,
+                              (int)numAlarmMin.Value,
+                              (int)numAlarmSec.Value))) {
+                //make it tomorrow
+                return (new DateTime(DateTime.Now.AddDays(1).Year,
+                        DateTime.Now.AddDays(1).Month,
+                        DateTime.Now.AddDays(1).Day, (int)numAlarmHr.Value,
+                        (int)numAlarmMin.Value, (int)numAlarmSec.Value));
+            } else {
+                return (new DateTime(DateTime.Now.Year, DateTime.Now.Month,
+                                 DateTime.Now.Day, (int)numAlarmHr.Value,
+                                 (int)numAlarmMin.Value,
+                                 (int)numAlarmSec.Value));
+            }
+        }
+
         private void btnAddAlarm_Click(object sender, EventArgs e) {
             AlarmsTimers tmpAlarm = new AlarmsTimers();
             
             //verify that numericUpDown selectors are not at 0,0,0
-            if ((numAlarmHr.Value == 0) && 
-                (numAlarmMin.Value == 0) &&
-                (numAlarmSec.Value == 0)) {
-                //bogus entry
-                Console.WriteLine("You must enter a valid time for the " +
-                    "alarm to go off!");
+            if (!verifyLegitTime(true)) {
                 return;
             }
 
             //verify that name box is not still full of default value
             if (txtAlarmName.Text.CompareTo("Alarm Name Here") == 0) {
-                Console.WriteLine("You must enter a valid name for the " +
+                MessageBox.Show("You must enter a valid name for the " +
                     "alarm that you are setting!");
                 return;
             }
 
-            //check to see if alarm is for tomorrow
-            if ((DateTime.Now >=  
-                 new DateTime(DateTime.Now.Year, DateTime.Now.Month,
-                              DateTime.Now.Day, (int) numAlarmHr.Value,
-                              (int) numAlarmMin.Value, 
-                              (int) numAlarmSec.Value))) {
-                //make it tomorrow
-                tmpAlarm.target = 
-                    new DateTime(DateTime.Now.AddDays(1).Year,
-                        DateTime.Now.AddDays(1).Month,
-                        DateTime.Now.AddDays(1).Day, (int) numAlarmHr.Value,
-                        (int) numAlarmMin.Value, (int) numAlarmSec.Value);
-            } else {
-                tmpAlarm.target =
-                    new DateTime(DateTime.Now.Year, DateTime.Now.Month,
-                                 DateTime.Now.Day, (int) numAlarmHr.Value,
-                                 (int) numAlarmMin.Value, 
-                                 (int) numAlarmSec.Value);
-            }
-
-            //set interval & name (actually we don't need to set interval here)
-            //tmpAlarm.autoSetInterval();
+            //check to see if alarm is for tomorrow, set other options
+            tmpAlarm.target = checkAlarmDay();
             tmpAlarm.name = txtAlarmName.Text;
-            tmpAlarm.running = true;
+            //tmpAlarm.running = true;  //wut? bug?
 
             //reset textbox & numericUpDowns
             txtAlarmName.Text = "Alarm Name Here";
-            numAlarmHr.Value = 0;
-            numAlarmMin.Value = 0;
-            numAlarmSec.Value = 0;
+            numAlarmHr.Value = 0; numAlarmMin.Value = 0; numAlarmSec.Value = 0;
 
-            //add it to the list (do not set it running for now, we'll
-            //handle that with the checkboxlist code)
+            //add it to the list
             activeAls.Add(tmpAlarm);
 
             //add alarm to the 'active' alarms list in the checkboxlist
             addAlarm(activeAls.IndexOf(tmpAlarm));
-            //and, of course, add it to our configuration file
             saveAlarmsTimers();
         }
         
@@ -126,6 +145,77 @@ namespace WindowsFormsApplication1
             return true;
         }
 
+        private String[] parseSavedFieldsLine(String rawLine) {
+            //per line basis
+            String[] rawFields;
+
+            rawFields = rawLine.Split(',');
+            if (rawFields.Count() != 5) {
+                MessageBox.Show("Error parsing " + cfgFile +
+                    "; please check the config file and try again!");
+                rawFields[0] = null;    //poor way to indicate error condition
+            }
+
+            return rawFields;
+        }
+
+        private int[] convertSavedFields(String[] rawFields) {
+            int[] tmpTimes = {0, 0, 0};
+            Boolean tmpFlag = false;    //try to find out a better way to do
+
+            if (!Int32.TryParse(rawFields[2], out tmpTimes[0])) {
+                tmpFlag = true;
+            }
+            if (!Int32.TryParse(rawFields[3], out tmpTimes[1])) {
+                tmpFlag = true;
+            }
+            if (!Int32.TryParse(rawFields[4], out tmpTimes[2])) {
+                tmpFlag = true;
+            }
+            if (tmpFlag) {
+                MessageBox.Show("There was an error trying to parse " +
+                    "one of the fields in " + cfgFile + "\nPlease " +
+                    "try to find out what the hell is going on and " +
+                    "try again later.");
+                tmpTimes[0] = 0; tmpTimes[1] = 0; tmpTimes[2] = 0;
+            }
+            return tmpTimes;
+        }
+
+        private DateTime checkDate(int[] timeData) {
+            Boolean tmpFlag = false;
+            DateTime tDate = new DateTime();
+
+            if (timeData[0] < DateTime.Now.Hour) {
+                tmpFlag = true;
+            } else if ((timeData[0] == DateTime.Now.Hour) &&
+              (timeData[1] < DateTime.Now.Minute)) {
+                tmpFlag = true;
+            } else if ((timeData[0] == DateTime.Now.Hour) &&
+                       (timeData[1] == DateTime.Now.Minute) &&
+                       (timeData[2] < DateTime.Now.Second)) {
+                tmpFlag = true;
+            }
+            if (tmpFlag) {
+                tDate =
+                    new DateTime(DateTime.Now.AddDays(1).Year,
+                        DateTime.Now.AddDays(1).Month,
+                        DateTime.Now.AddDays(1).Day, timeData[0],
+                        timeData[1], timeData[2]);
+            } else {
+                tDate =
+                    new DateTime(DateTime.Now.Year,
+                        DateTime.Now.Month,
+                        DateTime.Now.Day, timeData[0], timeData[1], 
+                        timeData[2]);
+            }
+            //of course the preceding code will have to be changed as
+            //the application will occasionally probably run more than
+            //one day rendering the dates calculated above bogus
+            //(see hint in BUGS at the top of the code)
+            return tDate;
+        }
+
         private Boolean loadAlarmsTimers() {
             if (!File.Exists(cfgFile)) {
                 if (debugging) {
@@ -139,8 +229,7 @@ namespace WindowsFormsApplication1
             int cntr = 0;
 
             try {
-                //no need to close after ReadAllLines()
-                rawFile = System.IO.File.ReadAllLines(cfgFile);
+                rawFile = System.IO.File.ReadAllLines(cfgFile); //no need4close
             } catch {
                 MessageBox.Show("There was an error reading " + cfgFile +
                     ", aborting.");
@@ -150,74 +239,33 @@ namespace WindowsFormsApplication1
             foreach (String raw in rawFile) {
                 String[] rawFields;
                 //DateTime tmpTime;
-                int tmpHr, tmpMin, tmpSec;
-                Boolean tmpFlag = false;
+                int[] tmpTimeData;
+                //Boolean tmpFlag = false;
                 AlarmsTimers tmpAlarm = new AlarmsTimers();
 
-                rawFields = raw.Split(',');
-                if (rawFields.Count() != 5) {
-                    //error in the textfile
-                    MessageBox.Show("Error parsing " + cfgFile +
-                        "; please check what the hell is going on and try " +
-                        "again later :)");
+                rawFields = parseSavedFieldsLine(raw);
+                if (rawFields[0] == null) {
+                    //DOH!
                     break;
-                }
-                if (rawFields[0] == "A") {
-                    //We're dealing with an alarm
-                    if (!Int32.TryParse(rawFields[2], out tmpHr)) {
-                        tmpFlag = true;
-                    }
-                    if (!Int32.TryParse(rawFields[3], out tmpMin)) {
-                        tmpFlag = true;
-                    }
-                    if (!Int32.TryParse(rawFields[4], out tmpSec)) {
-                        tmpFlag = true;
-                    }
-                    if (tmpFlag) {
-                        MessageBox.Show("There was an error trying to parse " +
-                            "one of the fields in " + cfgFile + "\nPlease " +
-                            "try to find out what the hell is going on and " +
-                            "try again later.");
-                        return false;
+                } else if (rawFields[0] == "A") {   //alarm
+                    tmpTimeData = convertSavedFields(rawFields);
+
+                    if ((tmpTimeData[0] == 0) && (tmpTimeData[1] == 0) &&
+                        (tmpTimeData[2] == 0)) {
+                        break;
                     }
 
                     //add to active alarms
                     tmpAlarm.name = rawFields[1];
                     tmpAlarm.running = false;
-                    tmpFlag = false;
+                    tmpAlarm.target = checkDate(tmpTimeData);
 
-                    if (tmpHr < DateTime.Now.Hour) {
-                        tmpFlag = true;
-                    }
-                    else if ((tmpHr == DateTime.Now.Hour) &&
-                      (tmpMin < DateTime.Now.Minute)) {
-                        tmpFlag = true;
-                    }
-                    else if ((tmpHr == DateTime.Now.Hour) &&
-                      (tmpMin == DateTime.Now.Minute) &&
-                      (tmpSec < DateTime.Now.Second)) {
-                        tmpFlag = true;
-                    }
-                    if (tmpFlag) {
-                        tmpAlarm.target =
-                            new DateTime(DateTime.Now.AddDays(1).Year,
-                                DateTime.Now.AddDays(1).Month,
-                                DateTime.Now.AddDays(1).Day, tmpHr,
-                                tmpMin, tmpSec);
-                    } else {
-                        tmpAlarm.target =
-                            new DateTime(DateTime.Now.Year,
-                                DateTime.Now.Month,
-                                DateTime.Now.Day, tmpHr, tmpMin, tmpSec);
-                    }
-                    //of course the preceding code will have to be changed as
-                    //the application will occasionally probably run more than
-                    //one day rendering the dates calculated above bogus
-                    //(see hint in BUGS at the top of the code)
                     activeAls.Add(tmpAlarm);
                     addAlarm(cntr++);
                 } else {
                     //we're working with a timer here (add code later)
+                    MessageBox.Show("Timer unimplemented as of now");
+                    return false;
                 }
             }
 
