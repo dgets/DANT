@@ -16,18 +16,8 @@ using System.Media;
  *   will cause the target date to be in the past, and thus bogus.  Time needs 
  *   to be saved just as the hours, minutes, seconds, and calculated only when 
  *   the alarm is activated in order to fix this problem.
- * * Remove alarm button is not implemented yet.
  * * Timers section is not implemented yet.
- * * Alarm sounds are partially implemented; the chooser works, but the files
- *   have to be a simple wav file, nothing complex, and they are not
- *   implemented in the loading or saving of config data; it is all commented
- *   out right now because SimpleSound is a bunch of crap and can't play any
- *   decent sound files even in .wav containers; it's implemented as a beep
  *   right now
- * * 'beep' is not played until the form receives a click or the 'ring ring
- *   neo' dialog is closed; needs to be repeated UNTIL the dialog is closed
- * * trying to remove more than one alarm at a time raises an exception due to
- *   poor 'foreach' loop structure (reverse order?)
  * * handling for replacing the 'RING RING' checklist text with the original
  *   alarm text after the sound is done playing or the user stops it needs to
  *   be taken care of
@@ -45,9 +35,6 @@ namespace WindowsFormsApplication1
         public frmDamoANTs() { 
             String ouah;
 
-            //I don't know why this has to be done in such a lame manner
-            //my guess is that the compiler would handle it but Visual Studio
-            //is being stupid
             ouah = System.Environment.GetFolderPath(
                 Environment.SpecialFolder.Personal) + "\\DANT.cfg";
             cfgFile = ouah;
@@ -389,8 +376,7 @@ namespace WindowsFormsApplication1
         }
 
         private void tmrOneSec_Tick(object sender, EventArgs e) {
-            //alarms/
-
+            //alarms
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
                 if (!chklstAlarms.GetItemChecked(cntr)) {
                     if (debugging) {
@@ -439,8 +425,6 @@ namespace WindowsFormsApplication1
                             wplayer.URL = activeAls.ElementAt(cntr).soundBite;
                             wplayer.controls.play();
                         }
-                        //MessageBox.Show("Ring ring, Neo.");
-                        //addAlarm(cntr);
                     }
                 }
             }
