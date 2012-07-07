@@ -25,3 +25,14 @@ C:\Users\Khelair\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\Wi
 C:\Users\Khelair\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.Properties.Resources.resources
 C:\Users\Khelair\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\Users\Khelair\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.exe
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.pdb
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\bin\Debug\DamosAlarmsNTimers.exe
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\bin\Debug\DamosAlarmsNTimers.pdb
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\Interop.WMPLib.dll
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.csproj.ResolveComReference.cache
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.frmDamoANTs.resources
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.Properties.Resources.resources
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\RohypnolLarry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.write.1.tlog

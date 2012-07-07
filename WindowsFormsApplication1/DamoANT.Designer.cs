@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnToastAlarm = new System.Windows.Forms.Button();
             this.lblAlarmName = new System.Windows.Forms.Label();
             this.txtAlarmName = new System.Windows.Forms.TextBox();
             this.btnAddAlarm = new System.Windows.Forms.Button();
@@ -39,6 +40,7 @@
             this.numAlarmHr = new System.Windows.Forms.NumericUpDown();
             this.chklstAlarms = new System.Windows.Forms.CheckedListBox();
             this.lblAlarms = new System.Windows.Forms.Label();
+            this.btnToastTimer = new System.Windows.Forms.Button();
             this.lblTimerName = new System.Windows.Forms.Label();
             this.txtTimerName = new System.Windows.Forms.TextBox();
             this.btnAddTimer = new System.Windows.Forms.Button();
@@ -49,9 +51,9 @@
             this.chklstTimers = new System.Windows.Forms.CheckedListBox();
             this.lblTimers = new System.Windows.Forms.Label();
             this.tmrOneSec = new System.Windows.Forms.Timer(this.components);
-            this.btnToastAlarm = new System.Windows.Forms.Button();
-            this.btnToastTimer = new System.Windows.Forms.Button();
             this.openSoundFile = new System.Windows.Forms.OpenFileDialog();
+            this.lblWipeAlarm = new System.Windows.Forms.Label();
+            this.lblWipeTimer = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -72,6 +74,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.lblWipeAlarm);
             this.splitContainer1.Panel1.Controls.Add(this.btnToastAlarm);
             this.splitContainer1.Panel1.Controls.Add(this.lblAlarmName);
             this.splitContainer1.Panel1.Controls.Add(this.txtAlarmName);
@@ -85,6 +88,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.lblWipeTimer);
             this.splitContainer1.Panel2.Controls.Add(this.btnToastTimer);
             this.splitContainer1.Panel2.Controls.Add(this.lblTimerName);
             this.splitContainer1.Panel2.Controls.Add(this.txtTimerName);
@@ -98,6 +102,16 @@
             this.splitContainer1.Size = new System.Drawing.Size(515, 432);
             this.splitContainer1.SplitterDistance = 262;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // btnToastAlarm
+            // 
+            this.btnToastAlarm.Location = new System.Drawing.Point(12, 375);
+            this.btnToastAlarm.Name = "btnToastAlarm";
+            this.btnToastAlarm.Size = new System.Drawing.Size(75, 23);
+            this.btnToastAlarm.TabIndex = 1;
+            this.btnToastAlarm.Text = "Wipe Alarm";
+            this.btnToastAlarm.UseVisualStyleBackColor = true;
+            this.btnToastAlarm.Click += new System.EventHandler(this.btnToastAlarm_Click);
             // 
             // lblAlarmName
             // 
@@ -179,7 +193,6 @@
             // 
             // chklstAlarms
             // 
-            this.chklstAlarms.CheckOnClick = true;
             this.chklstAlarms.FormattingEnabled = true;
             this.chklstAlarms.Location = new System.Drawing.Point(12, 56);
             this.chklstAlarms.Name = "chklstAlarms";
@@ -196,6 +209,15 @@
             this.lblAlarms.Size = new System.Drawing.Size(113, 44);
             this.lblAlarms.TabIndex = 0;
             this.lblAlarms.Text = "Alarms";
+            // 
+            // btnToastTimer
+            // 
+            this.btnToastTimer.Location = new System.Drawing.Point(11, 375);
+            this.btnToastTimer.Name = "btnToastTimer";
+            this.btnToastTimer.Size = new System.Drawing.Size(75, 23);
+            this.btnToastTimer.TabIndex = 13;
+            this.btnToastTimer.Text = "Wipe Timer";
+            this.btnToastTimer.UseVisualStyleBackColor = true;
             // 
             // lblTimerName
             // 
@@ -276,7 +298,6 @@
             // 
             // chklstTimers
             // 
-            this.chklstTimers.CheckOnClick = true;
             this.chklstTimers.FormattingEnabled = true;
             this.chklstTimers.Location = new System.Drawing.Point(11, 56);
             this.chklstTimers.Name = "chklstTimers";
@@ -298,30 +319,29 @@
             this.tmrOneSec.Interval = 1000;
             this.tmrOneSec.Tick += new System.EventHandler(this.tmrOneSec_Tick);
             // 
-            // btnToastAlarm
-            // 
-            this.btnToastAlarm.Location = new System.Drawing.Point(12, 375);
-            this.btnToastAlarm.Name = "btnToastAlarm";
-            this.btnToastAlarm.Size = new System.Drawing.Size(75, 23);
-            this.btnToastAlarm.TabIndex = 1;
-            this.btnToastAlarm.Text = "Wipe Alarm";
-            this.btnToastAlarm.UseVisualStyleBackColor = true;
-            // 
-            // btnToastTimer
-            // 
-            this.btnToastTimer.Location = new System.Drawing.Point(11, 375);
-            this.btnToastTimer.Name = "btnToastTimer";
-            this.btnToastTimer.Size = new System.Drawing.Size(75, 23);
-            this.btnToastTimer.TabIndex = 13;
-            this.btnToastTimer.Text = "Wipe Timer";
-            this.btnToastTimer.UseVisualStyleBackColor = true;
-            // 
             // openSoundFile
             // 
-            this.openSoundFile.DefaultExt = "wav";
+            this.openSoundFile.DefaultExt = "mp3";
             this.openSoundFile.FileName = "openFileDialog1";
             this.openSoundFile.Title = "Alarm/Timer Notification Sound";
-            //this.openSoundFile.FileOk += new System.ComponentModel.CancelEventHandler(this.openSoundFile_FileOk);
+            // 
+            // lblWipeAlarm
+            // 
+            this.lblWipeAlarm.AutoSize = true;
+            this.lblWipeAlarm.Location = new System.Drawing.Point(9, 359);
+            this.lblWipeAlarm.Name = "lblWipeAlarm";
+            this.lblWipeAlarm.Size = new System.Drawing.Size(78, 13);
+            this.lblWipeAlarm.TabIndex = 1;
+            this.lblWipeAlarm.Text = "Check first and";
+            // 
+            // lblWipeTimer
+            // 
+            this.lblWipeTimer.AutoSize = true;
+            this.lblWipeTimer.Location = new System.Drawing.Point(8, 359);
+            this.lblWipeTimer.Name = "lblWipeTimer";
+            this.lblWipeTimer.Size = new System.Drawing.Size(78, 13);
+            this.lblWipeTimer.TabIndex = 13;
+            this.lblWipeTimer.Text = "Check first and";
             // 
             // frmDamoANTs
             // 
@@ -372,6 +392,8 @@
         private System.Windows.Forms.Button btnToastAlarm;
         private System.Windows.Forms.Button btnToastTimer;
         private System.Windows.Forms.OpenFileDialog openSoundFile;
+        private System.Windows.Forms.Label lblWipeAlarm;
+        private System.Windows.Forms.Label lblWipeTimer;
     }
 }
 

@@ -26,6 +26,11 @@ using System.Media;
  *   right now
  * * 'beep' is not played until the form receives a click or the 'ring ring
  *   neo' dialog is closed; needs to be repeated UNTIL the dialog is closed
+ * * trying to remove more than one alarm at a time raises an exception due to
+ *   poor 'foreach' loop structure (reverse order?)
+ * * handling for replacing the 'RING RING' checklist text with the original
+ *   alarm text after the sound is done playing or the user stops it needs to
+ *   be taken care of
  */
 
 namespace WindowsFormsApplication1
@@ -105,12 +110,12 @@ namespace WindowsFormsApplication1
         private void btnAddAlarm_Click(object sender, EventArgs e) {
             AlarmsTimers tmpAlarm = new AlarmsTimers();
 
-            /* DialogResult whatev = openSoundFile.ShowDialog();
+            DialogResult whatev = openSoundFile.ShowDialog();
             while (whatev != DialogResult.OK) {
                 whatev = openSoundFile.ShowDialog();
             }
 
-            tmpAlarm.soundBite = openSoundFile.FileName; */
+            tmpAlarm.soundBite = openSoundFile.FileName;
 
             //verify that numericUpDown selectors are not at 0,0,0
             if (!verifyLegitTime(true)) {
@@ -159,7 +164,8 @@ namespace WindowsFormsApplication1
                     cFile.WriteLine("A," + activeAls[cntr].name + "," +
                         activeAls[cntr].target.Hour + "," + 
                         activeAls[cntr].target.Minute + "," +
-                        activeAls[cntr].target.Second);
+                        activeAls[cntr].target.Second + "," +
+                        activeAls[cntr].soundBite);
                 } catch {
                     Console.WriteLine("Error adding activeAls[" +
                         cntr.ToString() + "]!");
@@ -174,7 +180,7 @@ namespace WindowsFormsApplication1
             String[] rawFields;
 
             rawFields = rawLine.Split(',');
-            if (rawFields.Count() != 5) {
+            if (rawFields.Count() != 6) {
                 MessageBox.Show("Error parsing " + cfgFile +
                     "; please check the config file and try again!");
                 rawFields[0] = null;    //poor way to indicate error condition
@@ -281,6 +287,7 @@ namespace WindowsFormsApplication1
                     tmpAlarm.name = rawFields[1];
                     tmpAlarm.running = false;
                     tmpAlarm.target = checkDate(tmpTimeData);
+                    tmpAlarm.soundBite = rawFields[5];
 
                     activeAls.Add(tmpAlarm);
                     addAlarm(cntr++);
@@ -290,7 +297,6 @@ namespace WindowsFormsApplication1
                     return false;
                 }
             }
-
             return true;
         }
 
@@ -326,7 +332,7 @@ namespace WindowsFormsApplication1
             public DateTime target;
             private TimeSpan interval;
             public Boolean running;
-            //public String soundBite;
+            public String soundBite;
 
             //method correctly sets interval for an alarm
             public void autoSetInterval() {
@@ -383,7 +389,8 @@ namespace WindowsFormsApplication1
         }
 
         private void tmrOneSec_Tick(object sender, EventArgs e) {
-            //alarms
+            //alarms/
+
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
                 if (!chklstAlarms.GetItemChecked(cntr)) {
                     if (debugging) {
@@ -399,8 +406,6 @@ namespace WindowsFormsApplication1
                         ":" + activeAls.ElementAt(cntr).target.Second));
                 }
 
-                //presume this is running
-                //if (activeAls.ElementAt(cntr).running == true) {
                 if (chklstAlarms.GetItemChecked(cntr)) {
                     activeAls.ElementAt(cntr).running = true;
                     activeAls.ElementAt(cntr).autoSetInterval();
@@ -417,16 +422,25 @@ namespace WindowsFormsApplication1
                             Console.WriteLine("Found activeAls[" +
                                 cntr.ToString() + "] to be firing");
                         }
+                        chklstAlarms.SetItemChecked(cntr, false);
                         chklstAlarms.Items.RemoveAt(cntr);
-                        tmrOneSec.Enabled = false;
-                        tmrOneSec.Stop();
-                        MessageBox.Show("Ring ring, Neo.");
-                        /* SoundPlayer alarmSound =
-                            new SoundPlayer(
-                                activeAls.ElementAt(cntr).soundBite);
-                        alarmSound.Play(); */
-                        SystemSounds.Beep.Play();
-                        addAlarm(cntr);
+                        chklstAlarms.Items.Insert(cntr, 
+                            activeAls.ElementAt(cntr).name + " -+=* RING " +
+                            " RING *=+-");
+                        if (chklstAlarms.CheckedIndices.Count == 0) {
+                            tmrOneSec.Enabled = false;
+                            tmrOneSec.Stop();
+                        }
+                        if (activeAls.ElementAt(cntr).soundBite == null) {
+                            SystemSounds.Beep.Play();
+                        } else {
+                            WMPLib.WindowsMediaPlayer wplayer =
+                                new WMPLib.WindowsMediaPlayer();
+                            wplayer.URL = activeAls.ElementAt(cntr).soundBite;
+                            wplayer.controls.play();
+                        }
+                        //MessageBox.Show("Ring ring, Neo.");
+                        //addAlarm(cntr);
                     }
                 }
             }
@@ -438,8 +452,6 @@ namespace WindowsFormsApplication1
         }
 
         private void checkActiveAlarms() {
-            //going to need something here to check the unchecked ones, too, to see if
-            //anything has stopped running :|
             if (debugging) {
                 Console.WriteLine("Firing chklstAlarms_Clicked");
             }
@@ -487,6 +499,14 @@ namespace WindowsFormsApplication1
             if (txtTimerName.Text.CompareTo("") == 0) {
                 txtTimerName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
                 txtTimerName.Text = "Timer Name Here";
+            }
+        }
+
+        private void btnToastAlarm_Click(object sender, EventArgs e) {
+            foreach (int ndx in chklstAlarms.CheckedIndices) {
+                chklstAlarms.Items.RemoveAt(ndx);
+                activeAls.RemoveAt(ndx);
+                saveAlarmsTimers();
             }
         }
     }
