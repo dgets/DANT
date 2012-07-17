@@ -17,10 +17,11 @@ using System.Media;
  *   to be saved just as the hours, minutes, seconds, and calculated only when 
  *   the alarm is activated in order to fix this problem.
  * * Timers section is not implemented yet.
- *   right now
  * * handling for replacing the 'RING RING' checklist text with the original
  *   alarm text after the sound is done playing or the user stops it needs to
  *   be taken care of
+ * * need to save the selected state of a window between redrawings when an
+ *   alarm is active
  */
 
 namespace WindowsFormsApplication1
@@ -31,7 +32,8 @@ namespace WindowsFormsApplication1
         public List<AlarmsTimers> activeTms = new List<AlarmsTimers>();
         private const Boolean debugging = true;
         private String cfgFile;
-
+        public frmEditWindow editWindow = null;
+        
         public frmDamoANTs() { 
             String ouah;
 
@@ -43,6 +45,60 @@ namespace WindowsFormsApplication1
 
             if (!loadAlarmsTimers()) {
                 MessageBox.Show("Issues loading saved alarms & timers!");
+            }
+        }
+
+        /*  --==** ALARM/TIMER CLASS **==-- */
+        public partial class AlarmsTimers {
+            public String name;
+            public DateTime target;
+            private TimeSpan interval;
+            public Boolean running;
+            public String soundBite;
+
+            //method correctly sets interval for an alarm
+            public void autoSetInterval() {
+                interval = target - DateTime.Now;
+            }
+
+            //method determines whether alarm/timer is 'firing' or not
+            public Boolean checkIfFiring() {
+                if (debugging) {
+                    Console.WriteLine("Checking if firing\nRunning value for: " +
+                        name + " is: " + running.ToString() + "\nSeconds " +
+                        "left: " + interval.TotalSeconds.ToString() + "\n" +
+                        "Target time: " + target.ToShortTimeString());
+                }
+
+                if ((interval.TotalSeconds < 1) &&
+                    (interval.TotalSeconds > -1)) {
+                    running = false;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            public String returnCountdown() {
+                String tmpHr, tmpMin, tmpSec;
+
+                if (interval.Hours < 10) {
+                    tmpHr = "0" + interval.Hours.ToString();
+                } else {
+                    tmpHr = interval.Hours.ToString();
+                }
+                if (interval.Minutes < 10) {
+                    tmpMin = "0" + interval.Minutes.ToString();
+                } else {
+                    tmpMin = interval.Minutes.ToString();
+                }
+                if (interval.Seconds < 10) {
+                    tmpSec = "0" + interval.Seconds.ToString();
+                } else {
+                    tmpSec = interval.Seconds.ToString();
+                }
+
+                return (tmpHr + ":" + tmpMin + ":" + tmpSec);
             }
         }
 
@@ -313,60 +369,6 @@ namespace WindowsFormsApplication1
                 tmpHr + ":" + tmpMin + ":" + tmpSec));
         }
 
-        /*  --==** ALARM/TIMER CLASS **==-- */
-        public partial class AlarmsTimers {
-            public String name;
-            public DateTime target;
-            private TimeSpan interval;
-            public Boolean running;
-            public String soundBite;
-
-            //method correctly sets interval for an alarm
-            public void autoSetInterval() {
-                interval = target - DateTime.Now;
-            }
-
-            //method determines whether alarm/timer is 'firing' or not
-            public Boolean checkIfFiring() {
-                if (debugging) {
-                    Console.WriteLine("Checking if firing\nRunning value for: " +
-                        name + " is: " + running.ToString() + "\nSeconds " +
-                        "left: " + interval.TotalSeconds.ToString() + "\n" +
-                        "Target time: " + target.ToShortTimeString());
-                }
-
-                if ((interval.TotalSeconds < 1) &&
-                    (interval.TotalSeconds > -1)) {
-                    running = false;
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            public String returnCountdown() {
-                String tmpHr, tmpMin, tmpSec;
-
-                if (interval.Hours < 10) {
-                    tmpHr = "0" + interval.Hours.ToString();
-                } else {
-                    tmpHr = interval.Hours.ToString();
-                }
-                if (interval.Minutes < 10) {
-                    tmpMin = "0" + interval.Minutes.ToString();
-                } else {
-                    tmpMin = interval.Minutes.ToString();
-                }
-                if (interval.Seconds < 10) {
-                    tmpSec = "0" + interval.Seconds.ToString();
-                } else {
-                    tmpSec = interval.Seconds.ToString();
-                }
-
-                return (tmpHr + ":" + tmpMin + ":" + tmpSec);
-            }
-        }
-
         private void chklstAlarms_CheckedChanged(object sender, ItemCheckEventArgs e) {
             if (debugging) {
                 Console.WriteLine("activeAls.Count: " + activeAls.Count.ToString() +
@@ -491,6 +493,34 @@ namespace WindowsFormsApplication1
                 chklstAlarms.Items.RemoveAt(ndx);
                 activeAls.RemoveAt(ndx);
                 saveAlarmsTimers();
+            }
+        }
+
+        private void btnEditAlarm_Click(object sender, EventArgs e) {
+            if (chklstAlarms.CheckedIndices.Count == 0) {
+                MessageBox.Show("You must check an alarm before trying to " +
+                    "edit it!");
+            } else {
+                editWindow = new frmEditWindow(this);
+                editWindow.Show();
+                //don't forget to wipe and re-load alarms and timers here
+                //afterwards with this very ghey solution
+            }
+        }
+
+        public void editWindowMadeChanges(int ndx, String an, int hr, int min, int sec, String fn) {
+            //create a method for resetting the chklst string if this is not
+            //accomplished by unchecking the list item and/or calling the
+            //method that is fired when it is unchecked
+            activeAls[ndx].name = an;
+            activeAls[ndx].target = new DateTime(DateTime.Now.Year,
+                DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
+            activeAls[ndx].soundBite = fn;
+            activeAls[ndx].autoSetInterval();
+
+            chklstAlarms.SetItemChecked(ndx, false);
+            if (!saveAlarmsTimers()) {
+                MessageBox.Show("Had an issue trying to save configuration");
             }
         }
     }

@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnEditAlarm = new System.Windows.Forms.Button();
             this.lblWipeAlarm = new System.Windows.Forms.Label();
             this.btnToastAlarm = new System.Windows.Forms.Button();
             this.lblAlarmName = new System.Windows.Forms.Label();
@@ -54,7 +55,6 @@
             this.lblTimers = new System.Windows.Forms.Label();
             this.tmrOneSec = new System.Windows.Forms.Timer(this.components);
             this.openSoundFile = new System.Windows.Forms.OpenFileDialog();
-            this.btnEditAlarm = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -104,6 +104,16 @@
             this.splitContainer1.Size = new System.Drawing.Size(515, 432);
             this.splitContainer1.SplitterDistance = 262;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // btnEditAlarm
+            // 
+            this.btnEditAlarm.Location = new System.Drawing.Point(96, 375);
+            this.btnEditAlarm.Name = "btnEditAlarm";
+            this.btnEditAlarm.Size = new System.Drawing.Size(75, 23);
+            this.btnEditAlarm.TabIndex = 1;
+            this.btnEditAlarm.Text = "Edit Alarm";
+            this.btnEditAlarm.UseVisualStyleBackColor = true;
+            this.btnEditAlarm.Click += new System.EventHandler(this.btnEditAlarm_Click);
             // 
             // lblWipeAlarm
             // 
@@ -204,6 +214,7 @@
             // 
             // chklstAlarms
             // 
+            this.chklstAlarms.CheckOnClick = true;
             this.chklstAlarms.FormattingEnabled = true;
             this.chklstAlarms.Location = new System.Drawing.Point(12, 56);
             this.chklstAlarms.Name = "chklstAlarms";
@@ -318,6 +329,7 @@
             // 
             // chklstTimers
             // 
+            this.chklstTimers.CheckOnClick = true;
             this.chklstTimers.FormattingEnabled = true;
             this.chklstTimers.Location = new System.Drawing.Point(11, 56);
             this.chklstTimers.Name = "chklstTimers";
@@ -344,15 +356,6 @@
             this.openSoundFile.DefaultExt = "mp3";
             this.openSoundFile.FileName = "openFileDialog1";
             this.openSoundFile.Title = "Alarm/Timer Notification Sound";
-            // 
-            // btnEditAlarm
-            // 
-            this.btnEditAlarm.Location = new System.Drawing.Point(175, 327);
-            this.btnEditAlarm.Name = "btnEditAlarm";
-            this.btnEditAlarm.Size = new System.Drawing.Size(75, 23);
-            this.btnEditAlarm.TabIndex = 1;
-            this.btnEditAlarm.Text = "Edit Alarm";
-            this.btnEditAlarm.UseVisualStyleBackColor = true;
             // 
             // frmDamoANTs
             // 
@@ -381,7 +384,6 @@
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.CheckedListBox chklstAlarms;
         private System.Windows.Forms.Label lblAlarms;
         private System.Windows.Forms.CheckedListBox chklstTimers;
         private System.Windows.Forms.Label lblTimers;
@@ -397,7 +399,6 @@
         private System.Windows.Forms.NumericUpDown numTimerHr;
         private System.Windows.Forms.Timer tmrOneSec;
         private System.Windows.Forms.Label lblAlarmName;
-        private System.Windows.Forms.TextBox txtAlarmName;
         private System.Windows.Forms.Label lblTimerName;
         private System.Windows.Forms.TextBox txtTimerName;
         private System.Windows.Forms.Button btnToastAlarm;
@@ -406,6 +407,8 @@
         private System.Windows.Forms.Label lblWipeAlarm;
         private System.Windows.Forms.Label lblWipeTimer;
         private System.Windows.Forms.Button btnEditAlarm;
+        public System.Windows.Forms.CheckedListBox chklstAlarms;
+        internal System.Windows.Forms.TextBox txtAlarmName;
     }
 }
 

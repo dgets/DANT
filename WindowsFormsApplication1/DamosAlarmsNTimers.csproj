@@ -8,7 +8,7 @@
     <ProjectGuid>{EAD04D74-9C58-4FDF-A50C-D1CFDD2D7094}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DamosAlarmsNTimers</RootNamespace>
+    <RootNamespace>WindowsFormsApplication1</RootNamespace>
     <AssemblyName>DamosAlarmsNTimers</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>

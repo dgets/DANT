@@ -44,6 +44,7 @@ C:\Users\Rohypnol Larry\Documents\GitHub\DANT\WindowsFormsApplication1\bin\Debug
 C:\Users\Rohypnol Larry\Documents\GitHub\DANT\WindowsFormsApplication1\bin\Debug\DamosAlarmsNTimers.pdb
 C:\Users\Rohypnol Larry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\Rohypnol Larry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.frmDamoANTs.resources
-C:\Users\Rohypnol Larry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.Properties.Resources.resources
 C:\Users\Rohypnol Larry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\Users\Rohypnol Larry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Rohypnol Larry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\Rohypnol Larry\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.frmEditWindow.resources
