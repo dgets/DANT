@@ -278,6 +278,7 @@
             this.btnAddTimer.TabIndex = 10;
             this.btnAddTimer.Text = "Add Timer";
             this.btnAddTimer.UseVisualStyleBackColor = true;
+            this.btnAddTimer.Click += new System.EventHandler(this.btnAddTimer_Click);
             // 
             // lblTimerAddTime
             // 

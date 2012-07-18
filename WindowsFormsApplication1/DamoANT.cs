@@ -16,8 +16,18 @@ using System.Media;
  *   alarm text after the sound is done playing or the user stops it needs to
  *   be taken care of
  * * need to save the selected state of a window between redrawings when an
- *   alarm is active
- * * are checkDate() and checkAlarmDay() redundant?
+ *   alarm is active - then 'selection' as opposed to 'checked' status needs
+ *   to be used for non-activating events as this is annoying and not very
+ *   intuitive for the end user
+ * * Are checkDate() and checkAlarmDay() redundant?
+ * * Wipe Alarm button doesn't stop timer from ticking
+ * * When toggling one alarm from active to inactive and back, the alarm does
+ *   not properly start the timer ticking and countdown again; this is not a
+ *   problem when activating one then deactivating it, toggling another one, 
+ *   and then coming back to the first one, though
+ * * For both alarms & timers, need to set a 'confirm' dialog that'll allow
+ *   the user to use a time of 00:00:00 instead of automatically disallowing
+ *   it in case they need it set for midnight
  */
 
 namespace WindowsFormsApplication1
@@ -144,12 +154,7 @@ namespace WindowsFormsApplication1
         private void btnAddAlarm_Click(object sender, EventArgs e) {
             AlarmsTimers tmpAlarm = new AlarmsTimers();
 
-            DialogResult whatev = openSoundFile.ShowDialog();
-            while (whatev != DialogResult.OK) {
-                whatev = openSoundFile.ShowDialog();
-            }
-
-            tmpAlarm.soundBite = openSoundFile.FileName;
+            tmpAlarm.soundBite = soundByteSelection();
 
             //verify that numericUpDown selectors are not at 0,0,0
             if (!verifyLegitTime(true)) {
@@ -332,29 +337,15 @@ namespace WindowsFormsApplication1
         }
 
         private void addAlarm(int alarmNo) {
-            String tmpHr, tmpMin, tmpSec;
-            //there has really got to be simpler formatting methods to handle this shit
-            if (activeAls.ElementAt(alarmNo).target.Hour < 10) {
-                tmpHr = "0" + activeAls.ElementAt(alarmNo).target.Hour.ToString();
-            } else {
-                tmpHr = activeAls.ElementAt(alarmNo).target.Hour.ToString();
-            }
+            chklstAlarms.Items.Insert(alarmNo,
+                (activeAls.ElementAt(alarmNo).name + " -> " +
+                 addZeroesToTime(activeAls.ElementAt(alarmNo).target)));
+        }
 
-            if (activeAls.ElementAt(alarmNo).target.Minute < 10) {
-                tmpMin = "0" + activeAls.ElementAt(alarmNo).target.Minute.ToString();
-            } else {
-                tmpMin = activeAls.ElementAt(alarmNo).target.Minute.ToString();
-            }
-
-            if (activeAls.ElementAt(alarmNo).target.Second < 10) {
-                tmpSec = "0" + activeAls.ElementAt(alarmNo).target.Second.ToString();
-            } else {
-                tmpSec = activeAls.ElementAt(alarmNo).target.Second.ToString();
-            }
-
-            //note alarm will not be running at this point; just add it to the chkboxlist
-            chklstAlarms.Items.Insert(alarmNo, (activeAls.ElementAt(alarmNo).name + " -> " +
-                tmpHr + ":" + tmpMin + ":" + tmpSec));
+        private void addTimer(int timerNo) {
+            chklstTimers.Items.Insert(timerNo,
+                (activeTms.ElementAt(timerNo).name + " -> " +
+                 addZeroesToTime(activeTms.ElementAt(timerNo).target)));
         }
 
         private void chklstAlarms_CheckedChanged(object sender, ItemCheckEventArgs e) {
@@ -377,9 +368,7 @@ namespace WindowsFormsApplication1
                     chklstAlarms.Items.RemoveAt(cntr);
                     chklstAlarms.Items.Insert(cntr,
                         (activeAls.ElementAt(cntr).name + " -> " +
-                        activeAls.ElementAt(cntr).target.Hour + ":" +
-                        activeAls.ElementAt(cntr).target.Minute +
-                        ":" + activeAls.ElementAt(cntr).target.Second));
+                         addZeroesToTime(activeAls.ElementAt(cntr).target)));
                 }
 
                 if (chklstAlarms.GetItemChecked(cntr)) {
@@ -419,6 +408,13 @@ namespace WindowsFormsApplication1
                                 new WMPLib.WindowsMediaPlayer();
                             wplayer.URL = activeAls.ElementAt(cntr).soundBite;
                             wplayer.controls.play();
+
+                            MessageBox.Show(activeAls.ElementAt(cntr).name +
+                                ": -+=* Ring ring, Neo *=+-",
+                                activeAls.ElementAt(cntr).name + " Firing",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Exclamation);
+                            wplayer.controls.stop();
                         }
                     }
                 }
@@ -471,7 +467,7 @@ namespace WindowsFormsApplication1
         private void txtTimerName_Enter(object sender, EventArgs e) {
             if (txtTimerName.Text.CompareTo("Timer Name Here") == 0) {
                 txtTimerName.Text = "";
-                txtAlarmName.ForeColor = System.Drawing.SystemColors.WindowText;
+                txtTimerName.ForeColor = System.Drawing.SystemColors.WindowText;
             }
         }
 
@@ -491,6 +487,8 @@ namespace WindowsFormsApplication1
 
         private void btnToastAlarm_Click(object sender, EventArgs e) {
             foreach (int ndx in chklstAlarms.CheckedIndices) {
+                //need to add code in here to stop timer from ticking if
+                //necessary (if this was the only active alarm/timer)
                 chklstAlarms.Items.RemoveAt(ndx);
                 activeAls.RemoveAt(ndx);
                 saveAlarmsTimers();
@@ -520,6 +518,82 @@ namespace WindowsFormsApplication1
             if (!saveAlarmsTimers()) {
                 MessageBox.Show("Had an issue trying to save configuration");
             }
+        }
+
+        private String addZeroesToTime(DateTime ouah) {
+            int hr, min, sec;
+            String targetZeroesAdded;
+
+            hr = ouah.Hour; min = ouah.Minute; sec = ouah.Second;
+
+            if (hr < 10) {
+                targetZeroesAdded = "0" + hr.ToString();
+            } else {
+                targetZeroesAdded = hr.ToString();
+            }
+            targetZeroesAdded += ":";
+            if (min < 10) {
+                targetZeroesAdded += "0" + min.ToString();
+            } else {
+                targetZeroesAdded += min.ToString();
+            }
+            targetZeroesAdded += ":";
+            if (sec < 10) {
+                targetZeroesAdded += "0" + sec.ToString();
+            } else {
+                targetZeroesAdded += sec.ToString();
+            }
+
+            return targetZeroesAdded;
+        }
+
+        private void btnAddTimer_Click(object sender, EventArgs e) {
+            if (txtTimerName.Text.CompareTo("") == 0) {
+                MessageBox.Show("You must enter a timer name!",
+                    "Timer Name Required");
+            }
+            if ((numTimerHr.Value == 0) && (numTimerMin.Value == 0) &&
+                (numTimerSec.Value == 0)) {
+                //this messagebox needs to be turned into a dialog to verify
+                //that the user wants to use a time of midnight and hasn't
+                //just mistakenly clicked and added an unset timer
+                MessageBox.Show("You must enter a valid time!",
+                    "Duration Not Set");
+            }
+
+            AlarmsTimers tmpTimer = new AlarmsTimers();
+
+            tmpTimer.name = txtTimerName.Text;
+            tmpTimer.target = new DateTime(DateTime.Now.Year,
+                DateTime.Now.Month, DateTime.Now.Day, (int)numTimerHr.Value,
+                (int)numTimerMin.Value, (int)numTimerSec.Value);
+            tmpTimer.running = false;
+            tmpTimer.soundBite = soundByteSelection();
+
+            //reset textbox & numericUpDowns
+            txtTimerName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
+            txtTimerName.Text = "Timer Name Here";
+            numTimerHr.Value = 0; numTimerMin.Value = 0; numTimerSec.Value = 0;
+
+            //add it to the list
+            activeTms.Add(tmpTimer);
+
+            //add timer to the 'active' timers list in the checkboxlist
+            addTimer(activeTms.IndexOf(tmpTimer));
+            saveAlarmsTimers();
+        }
+
+        private String soundByteSelection() {
+            String ouah;
+
+            DialogResult whatev = openSoundFile.ShowDialog();
+            while (whatev != DialogResult.OK) {
+                whatev = openSoundFile.ShowDialog();
+            }
+
+            ouah = openSoundFile.FileName;
+
+            return ouah;
         }
     }
 }
