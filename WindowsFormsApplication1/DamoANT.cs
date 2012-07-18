@@ -11,17 +11,13 @@ using System.Media;
 
 /*
  * BUGS:
- * * When loading the save file, the target date is calculated automatically
- *   which, if the application is left running beyond the magic amount of time,
- *   will cause the target date to be in the past, and thus bogus.  Time needs 
- *   to be saved just as the hours, minutes, seconds, and calculated only when 
- *   the alarm is activated in order to fix this problem.
  * * Timers section is not implemented yet.
  * * handling for replacing the 'RING RING' checklist text with the original
  *   alarm text after the sound is done playing or the user stops it needs to
  *   be taken care of
  * * need to save the selected state of a window between redrawings when an
  *   alarm is active
+ * * are checkDate() and checkAlarmDay() redundant?
  */
 
 namespace WindowsFormsApplication1
@@ -128,25 +124,20 @@ namespace WindowsFormsApplication1
             return true;
         }
 
-        private DateTime checkAlarmDay() {
+        private DateTime checkAlarmDay(int hr, int min, int sec) {
             //check to see if alarm is for tomorrow
             //goddamn this needs to be refactored to just utilize the
             //hr/min/sec data and ditch the date
             if ((DateTime.Now >=
                  new DateTime(DateTime.Now.Year, DateTime.Now.Month,
-                              DateTime.Now.Day, (int)numAlarmHr.Value,
-                              (int)numAlarmMin.Value,
-                              (int)numAlarmSec.Value))) {
+                              DateTime.Now.Day, hr, min, sec))) {
                 //make it tomorrow
                 return (new DateTime(DateTime.Now.AddDays(1).Year,
                         DateTime.Now.AddDays(1).Month,
-                        DateTime.Now.AddDays(1).Day, (int)numAlarmHr.Value,
-                        (int)numAlarmMin.Value, (int)numAlarmSec.Value));
+                        DateTime.Now.AddDays(1).Day, hr, min, sec));
             } else {
                 return (new DateTime(DateTime.Now.Year, DateTime.Now.Month,
-                                 DateTime.Now.Day, (int)numAlarmHr.Value,
-                                 (int)numAlarmMin.Value,
-                                 (int)numAlarmSec.Value));
+                                 DateTime.Now.Day, hr, min, sec));
             }
         }
 
@@ -173,7 +164,9 @@ namespace WindowsFormsApplication1
             }
 
             //check to see if alarm is for tomorrow, set other options
-            tmpAlarm.target = checkAlarmDay();
+            tmpAlarm.target = checkAlarmDay((int)numAlarmHr.Value,
+                                            (int)numAlarmMin.Value,
+                                            (int)numAlarmSec.Value);
             tmpAlarm.name = txtAlarmName.Text;
 
             //reset textbox & numericUpDowns
@@ -219,7 +212,6 @@ namespace WindowsFormsApplication1
         }
 
         private String[] parseSavedFieldsLine(String rawLine) {
-            //per line basis
             String[] rawFields;
 
             rawFields = rawLine.Split(',');
@@ -282,10 +274,6 @@ namespace WindowsFormsApplication1
                         DateTime.Now.Day, timeData[0], timeData[1], 
                         timeData[2]);
             }
-            //of course the preceding code will have to be changed as
-            //the application will occasionally probably run more than
-            //one day rendering the dates calculated above bogus
-            //(see hint in BUGS at the top of the code)
             return tDate;
         }
 
@@ -396,6 +384,11 @@ namespace WindowsFormsApplication1
 
                 if (chklstAlarms.GetItemChecked(cntr)) {
                     activeAls.ElementAt(cntr).running = true;
+                    activeAls.ElementAt(cntr).target = 
+                        checkAlarmDay(
+                            (int)activeAls.ElementAt(cntr).target.Hour,
+                            (int)activeAls.ElementAt(cntr).target.Minute,
+                            (int)activeAls.ElementAt(cntr).target.Second);
                     activeAls.ElementAt(cntr).autoSetInterval();
 
                     //update the display
@@ -440,6 +433,14 @@ namespace WindowsFormsApplication1
         private void checkActiveAlarms() {
             if (debugging) {
                 Console.WriteLine("Firing chklstAlarms_Clicked");
+            }
+
+            if ((chklstAlarms.CheckedIndices.Count == 0) &&
+                (tmrOneSec.Enabled == true)) {
+                //turn the timer off, por dios
+                tmrOneSec.Stop();
+                tmrOneSec.Enabled = false;
+                return;
             }
 
             foreach (int temp in chklstAlarms.CheckedIndices) {
@@ -509,9 +510,6 @@ namespace WindowsFormsApplication1
         }
 
         public void editWindowMadeChanges(int ndx, String an, int hr, int min, int sec, String fn) {
-            //create a method for resetting the chklst string if this is not
-            //accomplished by unchecking the list item and/or calling the
-            //method that is fired when it is unchecked
             activeAls[ndx].name = an;
             activeAls[ndx].target = new DateTime(DateTime.Now.Year,
                 DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);

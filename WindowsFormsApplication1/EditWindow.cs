@@ -14,7 +14,6 @@ namespace WindowsFormsApplication1 {
         int ndx;
 
         public frmEditWindow(frmDamoANTs pf) {
-            //int ndx;
             InitializeComponent();
 
             primaryWindow = pf;
