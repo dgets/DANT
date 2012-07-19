@@ -11,7 +11,7 @@ using System.Media;
 
 /*
  * BUGS:
- * * Timers section is not implemented yet.
+ * * Timers section is not fully implemented yet.
  * * handling for replacing the 'RING RING' checklist text with the original
  *   alarm text after the sound is done playing or the user stops it needs to
  *   be taken care of
@@ -19,15 +19,17 @@ using System.Media;
  *   alarm is active - then 'selection' as opposed to 'checked' status needs
  *   to be used for non-activating events as this is annoying and not very
  *   intuitive for the end user
- * * Are checkDate() and checkAlarmDay() redundant?
  * * Wipe Alarm button doesn't stop timer from ticking
  * * When toggling one alarm from active to inactive and back, the alarm does
  *   not properly start the timer ticking and countdown again; this is not a
  *   problem when activating one then deactivating it, toggling another one, 
  *   and then coming back to the first one, though
- * * For both alarms & timers, need to set a 'confirm' dialog that'll allow
- *   the user to use a time of 00:00:00 instead of automatically disallowing
- *   it in case they need it set for midnight
+ * * Refactor checkDate() as per George Dorn's instructions for more efficient
+ *   and legible code (ie compare entire dates, not multiple DateTime.Nows)
+ * * checkActiveTimers() & checkActiveAlarms() both need to be more modular
+ *   and sub-functions need to verify that BOTH timers & alarms are fully
+ *   inactive before disabling timer ticks (this may be needed in other sub-
+ *   functions here as well)
  */
 
 namespace WindowsFormsApplication1
@@ -108,32 +110,6 @@ namespace WindowsFormsApplication1
             }
         }
 
-        private Boolean verifyLegitTime(Boolean alarmOrTimer) {
-            //note this method will be passed a T to check alarm data, F to
-            //check timer data (evil, but I'm not sure how to do it better)
-            if (alarmOrTimer) {
-                //alarm
-                if ((numAlarmHr.Value == 0) && (numAlarmMin.Value == 0) &&
-                    (numAlarmSec.Value == 0)) {
-                    //bogus alarm entry
-                    MessageBox.Show("You must enter a valid time for the " +
-                        "alarm to go off!");
-                    return false;
-                }
-            } else {
-                //timer
-                if ((numTimerHr.Value == 0) && (numTimerMin.Value == 0) &&
-                    (numTimerSec.Value == 0)) {
-                    //bogus timer entry
-                    MessageBox.Show("You must enter a valid duration for " +
-                        "the timer to go off!");
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         private DateTime checkAlarmDay(int hr, int min, int sec) {
             //check to see if alarm is for tomorrow
             //goddamn this needs to be refactored to just utilize the
@@ -152,21 +128,21 @@ namespace WindowsFormsApplication1
         }
 
         private void btnAddAlarm_Click(object sender, EventArgs e) {
-            AlarmsTimers tmpAlarm = new AlarmsTimers();
-
-            tmpAlarm.soundBite = soundByteSelection();
-
-            //verify that numericUpDown selectors are not at 0,0,0
-            if (!verifyLegitTime(true)) {
-                return;
-            }
-
             //verify that name box is not still full of default value
             if (txtAlarmName.Text.CompareTo("Alarm Name Here") == 0) {
                 MessageBox.Show("You must enter a valid name for the " +
                     "alarm that you are setting!");
                 return;
             }
+            //verify that numericUpDown selectors are not at 0,0,0
+            if (!legitTime((int)numAlarmHr.Value, (int)numAlarmMin.Value,
+                (int)numAlarmSec.Value, true)) {
+                return;
+            }
+            
+            AlarmsTimers tmpAlarm = new AlarmsTimers();
+
+            tmpAlarm.soundBite = soundByteSelection();
 
             //check to see if alarm is for tomorrow, set other options
             tmpAlarm.target = checkAlarmDay((int)numAlarmHr.Value,
@@ -253,6 +229,7 @@ namespace WindowsFormsApplication1
         }
 
         private DateTime checkDate(int[] timeData) {
+            //refactor this shit as per George Dorn's suggestions
             Boolean tmpFlag = false;
             DateTime tDate = new DateTime();
 
@@ -292,7 +269,7 @@ namespace WindowsFormsApplication1
             }
 
             String[] rawFile;
-            int cntr = 0;
+            int aCntr = 0, tCntr = 0;
 
             try {
                 rawFile = System.IO.File.ReadAllLines(cfgFile); //no need4close
@@ -305,32 +282,42 @@ namespace WindowsFormsApplication1
             foreach (String raw in rawFile) {
                 String[] rawFields;
                 int[] tmpTimeData;
-                AlarmsTimers tmpAlarm = new AlarmsTimers();
+                AlarmsTimers tmpEntry = new AlarmsTimers();
 
                 rawFields = parseSavedFieldsLine(raw);
                 if (rawFields[0] == null) {
                     //DOH!
                     break;
-                } else if (rawFields[0] == "A") {   //alarm
+                } else if (rawFields[0].CompareTo("A") == 0) {   //alarm
                     tmpTimeData = convertSavedFields(rawFields);
 
-                    if ((tmpTimeData[0] == 0) && (tmpTimeData[1] == 0) &&
-                        (tmpTimeData[2] == 0)) {
-                        break;
-                    }
-
                     //add to active alarms
-                    tmpAlarm.name = rawFields[1];
-                    tmpAlarm.running = false;
-                    tmpAlarm.target = checkDate(tmpTimeData);
-                    tmpAlarm.soundBite = rawFields[5];
+                    tmpEntry.name = rawFields[1];
+                    tmpEntry.running = false;
+                    tmpEntry.target = checkDate(tmpTimeData);
+                    tmpEntry.soundBite = rawFields[5];
 
-                    activeAls.Add(tmpAlarm);
-                    addAlarm(cntr++);
+                    activeAls.Add(tmpEntry);
+                    addAlarm(aCntr++);
+                } else if (rawFields[0].CompareTo("T") == 0) {
+                    //we're working with a timer here
+                    //MessageBox.Show("Timer unimplemented as of now");
+
+                    tmpTimeData = convertSavedFields(rawFields);
+
+                    tmpEntry.name = rawFields[1];
+                    tmpEntry.running = false;
+                    tmpEntry.target = checkDate(tmpTimeData);
+                    tmpEntry.soundBite = rawFields[5];
+
+                    activeTms.Add(tmpEntry);
+                    addTimer(tCntr++);
+                    //return false;
                 } else {
-                    //we're working with a timer here (add code later)
-                    MessageBox.Show("Timer unimplemented as of now");
-                    return false;
+                    //serious garbled file issues
+                    MessageBox.Show("Issue parsing config file!",
+                        "Cannot Parse DANT.cfg", MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
                 }
             }
             return true;
@@ -431,6 +418,7 @@ namespace WindowsFormsApplication1
                 Console.WriteLine("Firing chklstAlarms_Clicked");
             }
 
+            //refactor to check between alarms & timers, not just one or other
             if ((chklstAlarms.CheckedIndices.Count == 0) &&
                 (tmrOneSec.Enabled == true)) {
                 //turn the timer off, por dios
@@ -444,7 +432,7 @@ namespace WindowsFormsApplication1
                 //conditional should not be necessary
                 if (activeAls.ElementAt(temp).running != true) {
                     if (debugging) {
-                        Console.WriteLine("Flagged #" + temp.ToString());
+                        Console.WriteLine("Flagged alarm #" + temp.ToString());
                     }
 
                     //enable timer if it hasn't been handled already
@@ -552,13 +540,9 @@ namespace WindowsFormsApplication1
                 MessageBox.Show("You must enter a timer name!",
                     "Timer Name Required");
             }
-            if ((numTimerHr.Value == 0) && (numTimerMin.Value == 0) &&
-                (numTimerSec.Value == 0)) {
-                //this messagebox needs to be turned into a dialog to verify
-                //that the user wants to use a time of midnight and hasn't
-                //just mistakenly clicked and added an unset timer
-                MessageBox.Show("You must enter a valid time!",
-                    "Duration Not Set");
+            if (!legitTime((int)numTimerHr.Value, (int)numTimerMin.Value,
+                                (int)numTimerSec.Value, false)) {
+                return;
             }
 
             AlarmsTimers tmpTimer = new AlarmsTimers();
@@ -595,5 +579,64 @@ namespace WindowsFormsApplication1
 
             return ouah;
         }
+
+        private Boolean legitTime(int hr, int min, int sec, Boolean alarm) {
+            if ((hr == 0) && (min == 0) && (sec == 0) && (alarm)) {
+                DialogResult rslt = MessageBox.Show("Use a time of " +
+                    "midnight?", "Confirm Midnight",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                switch (rslt) {
+                    case DialogResult.Yes:
+                        return true;
+                        //break;
+                    case DialogResult.No:
+                        numAlarmHr.Focus();
+                        return false;
+                        //break;
+                }
+            } else if ((hr == 0) && (min == 0) && (sec == 0) && (!alarm)) {
+                MessageBox.Show("Invalid timer duration!", "Zero Timer",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            return true;
+        }
+
+        private void chklstTimers_SelectedIndexChanged(object sender, EventArgs e) {
+            this.BeginInvoke(new MethodInvoker(checkActiveTimers), null);
+        }
+
+        private void checkActiveTimers() {
+            if (debugging) {
+                Console.WriteLine("Firing chklstTimers_Clicked");
+            }
+
+            //refactor and move to its own func to check for alarms _&_ timers
+            if ((chklstTimers.CheckedIndices.Count == 0) &&
+                (tmrOneSec.Enabled == true)) {
+                //turn the timer off, por dios
+                tmrOneSec.Stop();
+                tmrOneSec.Enabled = false;
+                return;
+            }
+
+            foreach (int temp in chklstTimers.CheckedIndices) {
+                //these are specifically checked, so double checking that in the
+                //conditional should not be necessary
+                if (activeTms.ElementAt(temp).running != true) {
+                    if (debugging) {
+                        Console.WriteLine("Flagged timer #" + temp.ToString());
+                    }
+
+                    //enable timer if it hasn't been handled already
+                    if (tmrOneSec.Enabled == false) {
+                        activeTms.ElementAt(temp).running = true;
+                        tmrOneSec.Enabled = true;
+                        tmrOneSec.Start();
+                    }
+                }
+            }
+        }
+
     }
 }
