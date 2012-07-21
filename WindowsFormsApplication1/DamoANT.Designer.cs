@@ -42,6 +42,7 @@
             this.numAlarmHr = new System.Windows.Forms.NumericUpDown();
             this.chklstAlarms = new System.Windows.Forms.CheckedListBox();
             this.lblAlarms = new System.Windows.Forms.Label();
+            this.btnEditTimer = new System.Windows.Forms.Button();
             this.lblWipeTimer = new System.Windows.Forms.Label();
             this.btnToastTimer = new System.Windows.Forms.Button();
             this.lblTimerName = new System.Windows.Forms.Label();
@@ -55,7 +56,6 @@
             this.lblTimers = new System.Windows.Forms.Label();
             this.tmrOneSec = new System.Windows.Forms.Timer(this.components);
             this.openSoundFile = new System.Windows.Forms.OpenFileDialog();
-            this.btnEditTimer = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -234,6 +234,15 @@
             this.lblAlarms.TabIndex = 0;
             this.lblAlarms.Text = "Alarms";
             // 
+            // btnEditTimer
+            // 
+            this.btnEditTimer.Location = new System.Drawing.Point(95, 375);
+            this.btnEditTimer.Name = "btnEditTimer";
+            this.btnEditTimer.Size = new System.Drawing.Size(75, 23);
+            this.btnEditTimer.TabIndex = 13;
+            this.btnEditTimer.Text = "Edit Timer";
+            this.btnEditTimer.UseVisualStyleBackColor = true;
+            // 
             // lblWipeTimer
             // 
             this.lblWipeTimer.AutoSize = true;
@@ -361,15 +370,6 @@
             this.openSoundFile.FileName = "openFileDialog1";
             this.openSoundFile.Title = "Alarm/Timer Notification Sound";
             // 
-            // btnEditTimer
-            // 
-            this.btnEditTimer.Location = new System.Drawing.Point(95, 375);
-            this.btnEditTimer.Name = "btnEditTimer";
-            this.btnEditTimer.Size = new System.Drawing.Size(75, 23);
-            this.btnEditTimer.TabIndex = 13;
-            this.btnEditTimer.Text = "Edit Timer";
-            this.btnEditTimer.UseVisualStyleBackColor = true;
-            // 
             // frmDamoANTs
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -398,7 +398,6 @@
 
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Label lblAlarms;
-        private System.Windows.Forms.CheckedListBox chklstTimers;
         private System.Windows.Forms.Label lblTimers;
         private System.Windows.Forms.Button btnAddAlarm;
         private System.Windows.Forms.Label lblAlarmAddTime;
@@ -423,6 +422,7 @@
         public System.Windows.Forms.CheckedListBox chklstAlarms;
         internal System.Windows.Forms.TextBox txtAlarmName;
         private System.Windows.Forms.Button btnEditTimer;
+        public System.Windows.Forms.CheckedListBox chklstTimers;
     }
 }
 

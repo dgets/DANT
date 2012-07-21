@@ -12,14 +12,13 @@ using System.Media;
 /*
  * BUGS:
  * * Timers section is not fully implemented yet.
- * * handling for replacing the 'RING RING' checklist text with the original
- *   alarm text after the sound is done playing or the user stops it needs to
- *   be taken care of
  * * need to save the selected state of a window between redrawings when an
  *   alarm is active - then 'selection' as opposed to 'checked' status needs
  *   to be used for non-activating events as this is annoying and not very
  *   intuitive for the end user
- * * Wipe Alarm button doesn't stop timer from ticking
+ * * Wipe Alarm button doesn't stop timer from ticking -- modularize the code
+ *   to check for timer/alarm tickingness because it needs to be used in
+ *   several different places
  * * When toggling one alarm from active to inactive and back, the alarm does
  *   not properly start the timer ticking and countdown again; this is not a
  *   problem when activating one then deactivating it, toggling another one, 
@@ -27,9 +26,10 @@ using System.Media;
  * * Refactor checkDate() as per George Dorn's instructions for more efficient
  *   and legible code (ie compare entire dates, not multiple DateTime.Nows)
  * * checkActiveTimers() & checkActiveAlarms() both need to be more modular
- *   and sub-functions need to verify that BOTH timers & alarms are fully
- *   inactive before disabling timer ticks (this may be needed in other sub-
- *   functions here as well)
+ * * alternating clicking between active timers and active alarms causes 
+ *   bugs rendering the alarms, timers, or both, inactive even when properly
+ *   checked
+ * * timer doesn't set interval correctly, it processes it as an alarm target
  */
 
 namespace WindowsFormsApplication1
@@ -164,6 +164,8 @@ namespace WindowsFormsApplication1
         }
         
         private Boolean saveAlarmsTimers() {
+            int cntr;
+
             if (activeAls.Count() == 0) { return false; }
             
             System.IO.StreamWriter cFile = 
@@ -173,7 +175,7 @@ namespace WindowsFormsApplication1
                 Console.WriteLine("Opened " + cfgFile + " for writing");
             }
 
-            for (int cntr = 0; cntr < activeAls.Count(); cntr++) {
+            for (cntr = 0; cntr < activeAls.Count(); cntr++) {
                 if (debugging) {
                     Console.WriteLine("Adding activeAls[" + cntr.ToString() +
                         "] to save file . . .");
@@ -184,7 +186,22 @@ namespace WindowsFormsApplication1
                         activeAls[cntr].target.Second + "," +
                         activeAls[cntr].soundBite);
                 } catch {
-                    Console.WriteLine("Error adding activeAls[" +
+                    MessageBox.Show("Error adding activeAls[" +
+                        cntr.ToString() + "]!");
+                }
+            }
+            for (cntr = 0; cntr < activeTms.Count(); cntr++) {
+                if (debugging) {
+                    Console.WriteLine("Adding activeTms[" + cntr.ToString() +
+                        "] to save file . . .");
+                } try {
+                    cFile.WriteLine("T," + activeTms[cntr].name + "," +
+                        activeTms[cntr].target.Hour + "," +
+                        activeTms[cntr].target.Minute + "," +
+                        activeTms[cntr].target.Second + "," +
+                        activeTms[cntr].soundBite);
+                } catch {
+                    MessageBox.Show("Error adding activeTms[" +
                         cntr.ToString() + "]!");
                 }
             }
@@ -401,6 +418,73 @@ namespace WindowsFormsApplication1
                                 activeAls.ElementAt(cntr).name + " Firing",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Exclamation);
+                            chklstAlarms.Items.RemoveAt(cntr);
+                            addAlarm(cntr);
+                            wplayer.controls.stop();
+                        }
+                    }
+                }
+            }
+
+            //timers -- obviously this needs to be modularized
+            for (int cntr = 0; cntr < activeTms.Count; cntr++) {
+                if (!chklstTimers.GetItemChecked(cntr)) {
+                    if (debugging) {
+                        Console.WriteLine("Non-Active Timer #" +
+                            cntr.ToString() + " being unset");
+                    }
+                    activeTms.ElementAt(cntr).running = false;
+                    chklstTimers.Items.RemoveAt(cntr);
+                    chklstTimers.Items.Insert(cntr,
+                        (activeTms.ElementAt(cntr).name + " -> " +
+                         addZeroesToTime(activeTms.ElementAt(cntr).target)));
+                }
+
+                if (chklstTimers.GetItemChecked(cntr)) {
+                    activeTms.ElementAt(cntr).running = true;
+                    activeTms.ElementAt(cntr).target =
+                        checkAlarmDay(
+                            (int)activeTms.ElementAt(cntr).target.Hour,
+                            (int)activeTms.ElementAt(cntr).target.Minute,
+                            (int)activeTms.ElementAt(cntr).target.Second);
+                    activeTms.ElementAt(cntr).autoSetInterval();
+
+                    //update the display
+                    chklstTimers.Items.RemoveAt(cntr);
+                    chklstTimers.Items.Insert(cntr,
+                        activeTms.ElementAt(cntr).name + ": Remaining: " +
+                        activeTms.ElementAt(cntr).returnCountdown());
+                    chklstTimers.SetItemChecked(cntr, true);    //necessary?
+
+                    if (activeTms.ElementAt(cntr).checkIfFiring()) {
+                        if (debugging) {
+                            Console.WriteLine("Found activeAls[" +
+                                cntr.ToString() + "] to be firing");
+                        }
+                        chklstTimers.SetItemChecked(cntr, false);
+                        chklstTimers.Items.RemoveAt(cntr);
+                        chklstTimers.Items.Insert(cntr,
+                            activeTms.ElementAt(cntr).name + " -+=* RING " +
+                            " RING *=+-");
+                        if (chklstTimers.CheckedIndices.Count == 0) {
+                            tmrOneSec.Enabled = false;
+                            tmrOneSec.Stop();
+                        }
+                        if (activeTms.ElementAt(cntr).soundBite == null) {
+                            SystemSounds.Beep.Play();
+                        } else {
+                            WMPLib.WindowsMediaPlayer wplayer =
+                                new WMPLib.WindowsMediaPlayer();
+                            wplayer.URL = activeTms.ElementAt(cntr).soundBite;
+                            wplayer.controls.play();
+
+                            MessageBox.Show(activeTms.ElementAt(cntr).name +
+                                ": -+=* Ring ring, Neo *=+-",
+                                activeTms.ElementAt(cntr).name + " Firing",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Exclamation);
+                            chklstTimers.Items.RemoveAt(cntr);
+                            addTimer(cntr);
                             wplayer.controls.stop();
                         }
                     }
@@ -488,10 +572,10 @@ namespace WindowsFormsApplication1
                 MessageBox.Show("You must check an alarm before trying to " +
                     "edit it!");
             } else {
-                editWindow = new frmEditWindow(this);
+                editWindow = new frmEditWindow(this, true);
                 editWindow.Show();
                 //don't forget to wipe and re-load alarms and timers here
-                //afterwards with this very ghey solution
+                //afterwards
             }
         }
 
@@ -613,6 +697,7 @@ namespace WindowsFormsApplication1
 
             //refactor and move to its own func to check for alarms _&_ timers
             if ((chklstTimers.CheckedIndices.Count == 0) &&
+                (chklstAlarms.CheckedIndices.Count == 0) &&
                 (tmrOneSec.Enabled == true)) {
                 //turn the timer off, por dios
                 tmrOneSec.Stop();

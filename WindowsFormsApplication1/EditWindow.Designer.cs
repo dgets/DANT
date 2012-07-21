@@ -37,9 +37,13 @@
             this.btnEditSoundbyte = new System.Windows.Forms.Button();
             this.btnEditCommit = new System.Windows.Forms.Button();
             this.openNewSoundFile = new System.Windows.Forms.OpenFileDialog();
+            this.grpboxEntryType = new System.Windows.Forms.GroupBox();
+            this.radioAlarmType = new System.Windows.Forms.RadioButton();
+            this.radioTimerType = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.nudEditHour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudEditMinute)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudEditSecond)).BeginInit();
+            this.grpboxEntryType.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblEditing
@@ -133,7 +137,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(142, 43);
+            this.label1.Location = new System.Drawing.Point(142, 29);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(86, 26);
             this.label1.TabIndex = 9;
@@ -141,7 +145,7 @@
             // 
             // txtShowSoundByte
             // 
-            this.txtShowSoundByte.Location = new System.Drawing.Point(145, 75);
+            this.txtShowSoundByte.Location = new System.Drawing.Point(145, 58);
             this.txtShowSoundByte.Name = "txtShowSoundByte";
             this.txtShowSoundByte.ReadOnly = true;
             this.txtShowSoundByte.Size = new System.Drawing.Size(100, 20);
@@ -149,9 +153,9 @@
             // 
             // btnEditSoundbyte
             // 
-            this.btnEditSoundbyte.Location = new System.Drawing.Point(145, 104);
+            this.btnEditSoundbyte.Location = new System.Drawing.Point(158, 84);
             this.btnEditSoundbyte.Name = "btnEditSoundbyte";
-            this.btnEditSoundbyte.Size = new System.Drawing.Size(75, 44);
+            this.btnEditSoundbyte.Size = new System.Drawing.Size(70, 44);
             this.btnEditSoundbyte.TabIndex = 11;
             this.btnEditSoundbyte.Text = "Change\r\nSoundbyte";
             this.btnEditSoundbyte.UseVisualStyleBackColor = true;
@@ -159,7 +163,7 @@
             // 
             // btnEditCommit
             // 
-            this.btnEditCommit.Location = new System.Drawing.Point(106, 162);
+            this.btnEditCommit.Location = new System.Drawing.Point(15, 162);
             this.btnEditCommit.Name = "btnEditCommit";
             this.btnEditCommit.Size = new System.Drawing.Size(75, 41);
             this.btnEditCommit.TabIndex = 12;
@@ -171,11 +175,45 @@
             // 
             this.openNewSoundFile.FileName = "Not Set";
             // 
+            // grpboxEntryType
+            // 
+            this.grpboxEntryType.Controls.Add(this.radioTimerType);
+            this.grpboxEntryType.Controls.Add(this.radioAlarmType);
+            this.grpboxEntryType.Location = new System.Drawing.Point(158, 134);
+            this.grpboxEntryType.Name = "grpboxEntryType";
+            this.grpboxEntryType.Size = new System.Drawing.Size(70, 69);
+            this.grpboxEntryType.TabIndex = 13;
+            this.grpboxEntryType.TabStop = false;
+            this.grpboxEntryType.Text = "Type";
+            // 
+            // radioAlarmType
+            // 
+            this.radioAlarmType.AutoSize = true;
+            this.radioAlarmType.Location = new System.Drawing.Point(6, 19);
+            this.radioAlarmType.Name = "radioAlarmType";
+            this.radioAlarmType.Size = new System.Drawing.Size(51, 17);
+            this.radioAlarmType.TabIndex = 0;
+            this.radioAlarmType.TabStop = true;
+            this.radioAlarmType.Text = "Alarm";
+            this.radioAlarmType.UseVisualStyleBackColor = true;
+            // 
+            // radioTimerType
+            // 
+            this.radioTimerType.AutoSize = true;
+            this.radioTimerType.Location = new System.Drawing.Point(6, 42);
+            this.radioTimerType.Name = "radioTimerType";
+            this.radioTimerType.Size = new System.Drawing.Size(51, 17);
+            this.radioTimerType.TabIndex = 1;
+            this.radioTimerType.TabStop = true;
+            this.radioTimerType.Text = "Timer";
+            this.radioTimerType.UseVisualStyleBackColor = true;
+            // 
             // frmEditWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 215);
+            this.Controls.Add(this.grpboxEntryType);
             this.Controls.Add(this.btnEditCommit);
             this.Controls.Add(this.btnEditSoundbyte);
             this.Controls.Add(this.txtShowSoundByte);
@@ -194,6 +232,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudEditHour)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudEditMinute)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudEditSecond)).EndInit();
+            this.grpboxEntryType.ResumeLayout(false);
+            this.grpboxEntryType.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -215,5 +255,8 @@
         private System.Windows.Forms.Button btnEditSoundbyte;
         private System.Windows.Forms.Button btnEditCommit;
         private System.Windows.Forms.OpenFileDialog openNewSoundFile;
+        private System.Windows.Forms.GroupBox grpboxEntryType;
+        private System.Windows.Forms.RadioButton radioTimerType;
+        private System.Windows.Forms.RadioButton radioAlarmType;
     }
 }

@@ -13,17 +13,28 @@ namespace WindowsFormsApplication1 {
         private frmDamoANTs primaryWindow = null;
         int ndx;
 
-        public frmEditWindow(frmDamoANTs pf) {
+        public frmEditWindow(frmDamoANTs pf, Boolean alarm) {
             InitializeComponent();
 
             primaryWindow = pf;
-            ndx = pf.chklstAlarms.CheckedIndices[0];
-            
-            txtEditAlarmName.Text = primaryWindow.activeAls[ndx].name;
-            nudEditHour.Value = primaryWindow.activeAls[ndx].target.Hour;
-            nudEditMinute.Value = primaryWindow.activeAls[ndx].target.Minute;
-            nudEditSecond.Value = primaryWindow.activeAls[ndx].target.Second;
-            txtShowSoundByte.Text = primaryWindow.activeAls[ndx].soundBite;
+
+            if (alarm) {
+                ndx = pf.chklstAlarms.CheckedIndices[0];
+
+                txtEditAlarmName.Text = pf.activeAls[ndx].name;
+                nudEditHour.Value = pf.activeAls[ndx].target.Hour;
+                nudEditMinute.Value = pf.activeAls[ndx].target.Minute;
+                nudEditSecond.Value = pf.activeAls[ndx].target.Second;
+                txtShowSoundByte.Text = pf.activeAls[ndx].soundBite;
+            } else {
+                ndx = pf.chklstTimers.CheckedIndices[0];
+
+                txtEditAlarmName.Text = pf.activeTms[ndx].name;
+                nudEditHour.Value = pf.activeTms[ndx].target.Hour;
+                nudEditMinute.Value = pf.activeTms[ndx].target.Minute;
+                nudEditSecond.Value = pf.activeTms[ndx].target.Second;
+                txtShowSoundByte.Text = pf.activeTms[ndx].soundBite;
+            }
         }
 
         private void btnEditSoundbyte_Click(object sender, EventArgs e) {
