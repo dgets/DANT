@@ -242,6 +242,7 @@
             this.btnEditTimer.TabIndex = 13;
             this.btnEditTimer.Text = "Edit Timer";
             this.btnEditTimer.UseVisualStyleBackColor = true;
+            this.btnEditTimer.Click += new System.EventHandler(this.btnEditTimer_Click);
             // 
             // lblWipeTimer
             // 

@@ -18,7 +18,8 @@ using System.Media;
  *   intuitive for the end user
  * * Wipe Alarm button doesn't stop timer from ticking -- modularize the code
  *   to check for timer/alarm tickingness because it needs to be used in
- *   several different places
+ *   several different places; nor does finishing the editing process for an
+ *   alarm or timer
  * * When toggling one alarm from active to inactive and back, the alarm does
  *   not properly start the timer ticking and countdown again; this is not a
  *   problem when activating one then deactivating it, toggling another one, 
@@ -29,7 +30,11 @@ using System.Media;
  * * alternating clicking between active timers and active alarms causes 
  *   bugs rendering the alarms, timers, or both, inactive even when properly
  *   checked
- * * timer doesn't set interval correctly, it processes it as an alarm target
+ * * timer now sets interval correctly; however, the code for this is kludgy
+ *   as hell due to using the same object <AlarmsTimers> for both sorts of
+ *   items -- need to separate the class into one class for each
+ * * Alarm being set to run doesn't always fix the date object with 
+ *   checkAlarmDay() <-- not working properly
  */
 
 namespace WindowsFormsApplication1
@@ -63,10 +68,16 @@ namespace WindowsFormsApplication1
             private TimeSpan interval;
             public Boolean running;
             public String soundBite;
+            public Boolean alarm;
+            public DateTime tmpTarget;
 
             //method correctly sets interval for an alarm
             public void autoSetInterval() {
-                interval = target - DateTime.Now;
+                if (alarm) {
+                    interval = target - DateTime.Now;
+                } else {
+                    interval = tmpTarget - DateTime.Now;
+                }
             }
 
             //method determines whether alarm/timer is 'firing' or not
@@ -121,7 +132,9 @@ namespace WindowsFormsApplication1
                 return (new DateTime(DateTime.Now.AddDays(1).Year,
                         DateTime.Now.AddDays(1).Month,
                         DateTime.Now.AddDays(1).Day, hr, min, sec));
-            } else {
+            } else /* if ((DateTime.Now >= 
+                        new DateTime(DateTime.Now.Year, DateTime.Now.Month,
+                                     DateTime.Now.Day, 0, 0, 0))) */ {
                 return (new DateTime(DateTime.Now.Year, DateTime.Now.Month,
                                  DateTime.Now.Day, hr, min, sec));
             }
@@ -525,6 +538,12 @@ namespace WindowsFormsApplication1
                         tmrOneSec.Enabled = true;
                         tmrOneSec.Start();
                     }
+
+                    //handle checking the date due to our shitty handling
+                    activeAls.ElementAt(temp).target =
+                        checkAlarmDay(activeAls.ElementAt(temp).target.Hour,
+                            activeAls.ElementAt(temp).target.Minute,
+                            activeAls.ElementAt(temp).target.Second);
                 }
             }
         }
@@ -579,14 +598,26 @@ namespace WindowsFormsApplication1
             }
         }
 
-        public void editWindowMadeChanges(int ndx, String an, int hr, int min, int sec, String fn) {
-            activeAls[ndx].name = an;
-            activeAls[ndx].target = new DateTime(DateTime.Now.Year,
-                DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
-            activeAls[ndx].soundBite = fn;
-            activeAls[ndx].autoSetInterval();
+        public void editWindowMadeChanges(Boolean alarm, int ndx, String an,
+            int hr, int min, int sec, String fn) {
+            if (alarm) {
+                activeAls[ndx].name = an;
+                activeAls[ndx].target = new DateTime(DateTime.Now.Year,
+                    DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
+                activeAls[ndx].soundBite = fn;
+                activeAls[ndx].autoSetInterval();
 
-            chklstAlarms.SetItemChecked(ndx, false);
+                chklstAlarms.SetItemChecked(ndx, false);
+            } else {
+                activeTms[ndx].name = an;
+                activeTms[ndx].target = new DateTime(DateTime.Now.Year,
+                    DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
+                activeTms[ndx].soundBite = fn;
+                activeTms[ndx].autoSetInterval();
+
+                chklstTimers.SetItemChecked(ndx, false);
+            }
+
             if (!saveAlarmsTimers()) {
                 MessageBox.Show("Had an issue trying to save configuration");
             }
@@ -715,11 +746,34 @@ namespace WindowsFormsApplication1
 
                     //enable timer if it hasn't been handled already
                     if (tmrOneSec.Enabled == false) {
+                        if (activeTms.ElementAt(temp).tmpTarget ==
+                            DateTime.MinValue) {
+                            /* this is a CRAPPY way to handle this; I really
+                             * need to separate AlarmsTimers into 2 classes,
+                             * one for each sort of list to avoid this kludge*/
+                            activeTms.ElementAt(temp).tmpTarget =
+                                DateTime.Now.AddSeconds(
+                                    (activeTms.ElementAt(temp).target.Hour * 3600) +
+                                    (activeTms.ElementAt(temp).target.Minute * 60) +
+                                    (activeTms.ElementAt(temp).target.Second));
+                        }
                         activeTms.ElementAt(temp).running = true;
                         tmrOneSec.Enabled = true;
                         tmrOneSec.Start();
                     }
                 }
+            }
+        }
+
+        private void btnEditTimer_Click(object sender, EventArgs e) {
+            if (chklstTimers.CheckedIndices.Count == 0) {
+                MessageBox.Show("You must check a timer before trying to " +
+                    "edit it!");
+            } else {
+                editWindow = new frmEditWindow(this, false);
+                editWindow.Show();
+                //don't forget to wipe and re-load alarms and timers here
+                //afterwards
             }
         }
 

@@ -38,8 +38,8 @@
             this.btnEditCommit = new System.Windows.Forms.Button();
             this.openNewSoundFile = new System.Windows.Forms.OpenFileDialog();
             this.grpboxEntryType = new System.Windows.Forms.GroupBox();
-            this.radioAlarmType = new System.Windows.Forms.RadioButton();
             this.radioTimerType = new System.Windows.Forms.RadioButton();
+            this.radioAlarmType = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.nudEditHour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudEditMinute)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudEditSecond)).BeginInit();
@@ -186,20 +186,10 @@
             this.grpboxEntryType.TabStop = false;
             this.grpboxEntryType.Text = "Type";
             // 
-            // radioAlarmType
-            // 
-            this.radioAlarmType.AutoSize = true;
-            this.radioAlarmType.Location = new System.Drawing.Point(6, 19);
-            this.radioAlarmType.Name = "radioAlarmType";
-            this.radioAlarmType.Size = new System.Drawing.Size(51, 17);
-            this.radioAlarmType.TabIndex = 0;
-            this.radioAlarmType.TabStop = true;
-            this.radioAlarmType.Text = "Alarm";
-            this.radioAlarmType.UseVisualStyleBackColor = true;
-            // 
             // radioTimerType
             // 
             this.radioTimerType.AutoSize = true;
+            this.radioTimerType.Enabled = false;
             this.radioTimerType.Location = new System.Drawing.Point(6, 42);
             this.radioTimerType.Name = "radioTimerType";
             this.radioTimerType.Size = new System.Drawing.Size(51, 17);
@@ -207,6 +197,18 @@
             this.radioTimerType.TabStop = true;
             this.radioTimerType.Text = "Timer";
             this.radioTimerType.UseVisualStyleBackColor = true;
+            // 
+            // radioAlarmType
+            // 
+            this.radioAlarmType.AutoSize = true;
+            this.radioAlarmType.Enabled = false;
+            this.radioAlarmType.Location = new System.Drawing.Point(6, 19);
+            this.radioAlarmType.Name = "radioAlarmType";
+            this.radioAlarmType.Size = new System.Drawing.Size(51, 17);
+            this.radioAlarmType.TabIndex = 0;
+            this.radioAlarmType.TabStop = true;
+            this.radioAlarmType.Text = "Alarm";
+            this.radioAlarmType.UseVisualStyleBackColor = true;
             // 
             // frmEditWindow
             // 
