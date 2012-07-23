@@ -33,8 +33,10 @@ using System.Media;
  * * timer now sets interval correctly; however, the code for this is kludgy
  *   as hell due to using the same object <AlarmsTimers> for both sorts of
  *   items -- need to separate the class into one class for each
- * * Alarm being set to run doesn't always fix the date object with 
- *   checkAlarmDay() <-- not working properly
+ * * Timers and Alarms are both working separately; however, when an alarm is
+ *   checked and activated first the timer counts backward
+ * * When a timer is checked first, alarms do not continue to count after the
+ *   timer rings (check unsetting code in the ringing in _Tick)
  */
 
 namespace WindowsFormsApplication1
@@ -125,6 +127,15 @@ namespace WindowsFormsApplication1
             //check to see if alarm is for tomorrow
             //goddamn this needs to be refactored to just utilize the
             //hr/min/sec data and ditch the date
+            DateTime ouah = new DateTime(DateTime.Now.Year, DateTime.Now.Month,
+                DateTime.Now.Day, hr, min, sec);
+
+            if (DateTime.Now >= ouah) {
+                return ouah.AddDays(1);
+            } else {
+                return ouah;
+            }
+            /*
             if ((DateTime.Now >=
                  new DateTime(DateTime.Now.Year, DateTime.Now.Month,
                               DateTime.Now.Day, hr, min, sec))) {
@@ -132,11 +143,20 @@ namespace WindowsFormsApplication1
                 return (new DateTime(DateTime.Now.AddDays(1).Year,
                         DateTime.Now.AddDays(1).Month,
                         DateTime.Now.AddDays(1).Day, hr, min, sec));
-            } else /* if ((DateTime.Now >= 
-                        new DateTime(DateTime.Now.Year, DateTime.Now.Month,
-                                     DateTime.Now.Day, 0, 0, 0))) */ {
+            } else {
                 return (new DateTime(DateTime.Now.Year, DateTime.Now.Month,
                                  DateTime.Now.Day, hr, min, sec));
+            } */
+        }
+
+        private DateTime checkAlarmDay(int[] hrMinSec) {
+            DateTime ouah = new DateTime(DateTime.Now.Year, DateTime.Now.Month,
+                DateTime.Now.Day, hrMinSec[0], hrMinSec[1], hrMinSec[2]);
+
+            if (DateTime.Now >= ouah) {
+                return ouah.AddDays(1);
+            } else {
+                return ouah;
             }
         }
 
@@ -258,7 +278,7 @@ namespace WindowsFormsApplication1
             return tmpTimes;
         }
 
-        private DateTime checkDate(int[] timeData) {
+        /* private DateTime checkDate(int[] timeData) {
             //refactor this shit as per George Dorn's suggestions
             Boolean tmpFlag = false;
             DateTime tDate = new DateTime();
@@ -287,7 +307,7 @@ namespace WindowsFormsApplication1
                         timeData[2]);
             }
             return tDate;
-        }
+        } */
 
         private Boolean loadAlarmsTimers() {
             if (!File.Exists(cfgFile)) {
@@ -324,8 +344,9 @@ namespace WindowsFormsApplication1
                     //add to active alarms
                     tmpEntry.name = rawFields[1];
                     tmpEntry.running = false;
-                    tmpEntry.target = checkDate(tmpTimeData);
+                    tmpEntry.target = checkAlarmDay(tmpTimeData);
                     tmpEntry.soundBite = rawFields[5];
+                    tmpEntry.alarm = true;
 
                     activeAls.Add(tmpEntry);
                     addAlarm(aCntr++);
@@ -337,8 +358,9 @@ namespace WindowsFormsApplication1
 
                     tmpEntry.name = rawFields[1];
                     tmpEntry.running = false;
-                    tmpEntry.target = checkDate(tmpTimeData);
+                    tmpEntry.target = checkAlarmDay(tmpTimeData);
                     tmpEntry.soundBite = rawFields[5];
+                    tmpEntry.alarm = false;
 
                     activeTms.Add(tmpEntry);
                     addTimer(tCntr++);
@@ -532,18 +554,18 @@ namespace WindowsFormsApplication1
                         Console.WriteLine("Flagged alarm #" + temp.ToString());
                     }
 
+                    //handle checking the date due to our shitty handling
+                    activeAls.ElementAt(temp).target =
+                        checkAlarmDay(activeAls.ElementAt(temp).target.Hour,
+                            activeAls.ElementAt(temp).target.Minute,
+                            activeAls.ElementAt(temp).target.Second);
+
                     //enable timer if it hasn't been handled already
                     if (tmrOneSec.Enabled == false) {
                         activeAls.ElementAt(temp).running = true;
                         tmrOneSec.Enabled = true;
                         tmrOneSec.Start();
                     }
-
-                    //handle checking the date due to our shitty handling
-                    activeAls.ElementAt(temp).target =
-                        checkAlarmDay(activeAls.ElementAt(temp).target.Hour,
-                            activeAls.ElementAt(temp).target.Minute,
-                            activeAls.ElementAt(temp).target.Second);
                 }
             }
         }
@@ -776,6 +798,5 @@ namespace WindowsFormsApplication1
                 //afterwards
             }
         }
-
     }
 }
