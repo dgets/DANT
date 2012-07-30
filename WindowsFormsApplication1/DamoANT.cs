@@ -37,6 +37,16 @@ using System.Media;
  *   checked and activated first the timer counts backward
  * * When a timer is checked first, alarms do not continue to count after the
  *   timer rings (check unsetting code in the ringing in _Tick)
+ * * Need to make sure that any code looking for a running alarm/timer/both
+ *   is utilizing the new modularized code for it
+ */
+
+/*
+ * CHANGES:
+ * * Changes block added 7/27/2012
+ * * Modularized code for checking if a timer, an alarm, or both are running
+ * * Modularized code for unsetting an item in the timers or alarms list from
+ *   _Tick
  */
 
 namespace WindowsFormsApplication1
@@ -395,6 +405,25 @@ namespace WindowsFormsApplication1
             }
         }
 
+        private void unsetItem(int ndx, Boolean alarm) {
+            if (alarm) {
+                activeAls.ElementAt(ndx).running = false;
+                //reset the checklist, too
+                chklstAlarms.Items.RemoveAt(ndx);
+                chklstAlarms.Items.Insert(ndx,
+                    (activeAls.ElementAt(ndx).name + " -> " +
+                     addZeroesToTime(activeAls.ElementAt(ndx).target)));
+            } else {
+                activeTms.ElementAt(ndx).running = false;
+                //checklist, etc etc etc
+                chklstTimers.Items.RemoveAt(ndx);
+                chklstTimers.Items.Insert(ndx,
+                    (activeTms.ElementAt(ndx).name + " -> " +
+                     addZeroesToTime(activeTms.ElementAt(ndx).target)));
+            }
+        }
+
+        //modularize the SHIT out of this, goddamn it
         private void tmrOneSec_Tick(object sender, EventArgs e) {
             //alarms
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
@@ -403,11 +432,7 @@ namespace WindowsFormsApplication1
                         Console.WriteLine("Non-Active Alarm #" +
                             cntr.ToString() + " being unset");
                     }
-                    activeAls.ElementAt(cntr).running = false;
-                    chklstAlarms.Items.RemoveAt(cntr);
-                    chklstAlarms.Items.Insert(cntr,
-                        (activeAls.ElementAt(cntr).name + " -> " +
-                         addZeroesToTime(activeAls.ElementAt(cntr).target)));
+                    unsetItem(cntr, true);
                 }
 
                 if (chklstAlarms.GetItemChecked(cntr)) {
@@ -468,11 +493,7 @@ namespace WindowsFormsApplication1
                         Console.WriteLine("Non-Active Timer #" +
                             cntr.ToString() + " being unset");
                     }
-                    activeTms.ElementAt(cntr).running = false;
-                    chklstTimers.Items.RemoveAt(cntr);
-                    chklstTimers.Items.Insert(cntr,
-                        (activeTms.ElementAt(cntr).name + " -> " +
-                         addZeroesToTime(activeTms.ElementAt(cntr).target)));
+                    unsetItem(cntr, false);
                 }
 
                 if (chklstTimers.GetItemChecked(cntr)) {
@@ -532,14 +553,35 @@ namespace WindowsFormsApplication1
             this.BeginInvoke(new MethodInvoker(checkActiveAlarms), null);
         }
 
+        private Boolean anyRunning(Boolean onlyAlarms, Boolean checkAll) {
+            if (checkAll) {
+                if ((chklstAlarms.CheckedIndices.Count == 0) &&
+                    (chklstTimers.CheckedIndices.Count == 0)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else if (onlyAlarms) {
+                if (chklstAlarms.CheckedIndices.Count == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                if (chklstTimers.CheckedIndices.Count == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+
         private void checkActiveAlarms() {
             if (debugging) {
                 Console.WriteLine("Firing chklstAlarms_Clicked");
             }
 
-            //refactor to check between alarms & timers, not just one or other
-            if ((chklstAlarms.CheckedIndices.Count == 0) &&
-                (tmrOneSec.Enabled == true)) {
+            if ((!anyRunning(false, true)) && (tmrOneSec.Enabled == true)) {
                 //turn the timer off, por dios
                 tmrOneSec.Stop();
                 tmrOneSec.Enabled = false;
@@ -749,9 +791,7 @@ namespace WindowsFormsApplication1
             }
 
             //refactor and move to its own func to check for alarms _&_ timers
-            if ((chklstTimers.CheckedIndices.Count == 0) &&
-                (chklstAlarms.CheckedIndices.Count == 0) &&
-                (tmrOneSec.Enabled == true)) {
+            if (!anyRunning(false, true) && (tmrOneSec.Enabled == true)) {
                 //turn the timer off, por dios
                 tmrOneSec.Stop();
                 tmrOneSec.Enabled = false;
