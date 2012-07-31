@@ -405,6 +405,7 @@ namespace WindowsFormsApplication1
             }
         }
 
+        //originally created as modularization for _Tick
         private void unsetItem(int ndx, Boolean alarm) {
             if (alarm) {
                 activeAls.ElementAt(ndx).running = false;
@@ -420,6 +421,22 @@ namespace WindowsFormsApplication1
                 chklstTimers.Items.Insert(ndx,
                     (activeTms.ElementAt(ndx).name + " -> " +
                      addZeroesToTime(activeTms.ElementAt(ndx).target)));
+            }
+        }
+
+        private void updateDisplay(int ndx, Boolean alarm) {
+            if (alarm) {
+                chklstAlarms.Items.RemoveAt(ndx);
+                chklstAlarms.Items.Insert(ndx,
+                    activeAls.ElementAt(ndx).name + ": Remaining: " +
+                    activeAls.ElementAt(ndx).returnCountdown());
+                chklstAlarms.SetItemChecked(ndx, true);
+            } else {
+                chklstTimers.Items.RemoveAt(ndx);
+                chklstTimers.Items.Insert(ndx,
+                    activeTms.ElementAt(ndx).name + ": Remaining: " +
+                    activeTms.ElementAt(ndx).returnCountdown());
+                chklstTimers.SetItemChecked(ndx, true);
             }
         }
 
@@ -444,12 +461,7 @@ namespace WindowsFormsApplication1
                             (int)activeAls.ElementAt(cntr).target.Second);
                     activeAls.ElementAt(cntr).autoSetInterval();
 
-                    //update the display
-                    chklstAlarms.Items.RemoveAt(cntr);
-                    chklstAlarms.Items.Insert(cntr, 
-                        activeAls.ElementAt(cntr).name + ": Remaining: " +
-                        activeAls.ElementAt(cntr).returnCountdown());
-                    chklstAlarms.SetItemChecked(cntr, true);    //necessary?
+                    updateDisplay(cntr, true);
 
                     if (activeAls.ElementAt(cntr).checkIfFiring()) {
                         if (debugging) {
@@ -505,12 +517,7 @@ namespace WindowsFormsApplication1
                             (int)activeTms.ElementAt(cntr).target.Second);
                     activeTms.ElementAt(cntr).autoSetInterval();
 
-                    //update the display
-                    chklstTimers.Items.RemoveAt(cntr);
-                    chklstTimers.Items.Insert(cntr,
-                        activeTms.ElementAt(cntr).name + ": Remaining: " +
-                        activeTms.ElementAt(cntr).returnCountdown());
-                    chklstTimers.SetItemChecked(cntr, true);    //necessary?
+                    updateDisplay(cntr, false);
 
                     if (activeTms.ElementAt(cntr).checkIfFiring()) {
                         if (debugging) {
