@@ -468,16 +468,14 @@ namespace WindowsFormsApplication1
                             Console.WriteLine("Found activeAls[" +
                                 cntr.ToString() + "] to be firing");
                         }
-                        chklstAlarms.SetItemChecked(cntr, false);
-                        chklstAlarms.Items.RemoveAt(cntr);
-                        chklstAlarms.Items.Insert(cntr, 
-                            activeAls.ElementAt(cntr).name + " -+=* RING " +
-                            " RING *=+-");
-                        if (chklstAlarms.CheckedIndices.Count == 0) {
+                        ringRingNeo(true, cntr);
+                        if (anyRunning(false, true)) {
                             tmrOneSec.Enabled = false;
                             tmrOneSec.Stop();
                         }
-                        if (activeAls.ElementAt(cntr).soundBite == null) {
+                        playAudibleAlarm(false,
+                            activeAls.ElementAt(cntr).soundBite, cntr);
+                        /* if (activeAls.ElementAt(cntr).soundBite == null) {
                             SystemSounds.Beep.Play();
                         } else {
                             WMPLib.WindowsMediaPlayer wplayer =
@@ -493,7 +491,7 @@ namespace WindowsFormsApplication1
                             chklstAlarms.Items.RemoveAt(cntr);
                             addAlarm(cntr);
                             wplayer.controls.stop();
-                        }
+                        } */
                     }
                 }
             }
@@ -510,6 +508,7 @@ namespace WindowsFormsApplication1
 
                 if (chklstTimers.GetItemChecked(cntr)) {
                     activeTms.ElementAt(cntr).running = true;
+                    //problem in the next statement causing mistiming?
                     activeTms.ElementAt(cntr).target =
                         checkAlarmDay(
                             (int)activeTms.ElementAt(cntr).target.Hour,
@@ -524,15 +523,14 @@ namespace WindowsFormsApplication1
                             Console.WriteLine("Found activeAls[" +
                                 cntr.ToString() + "] to be firing");
                         }
-                        chklstTimers.SetItemChecked(cntr, false);
-                        chklstTimers.Items.RemoveAt(cntr);
-                        chklstTimers.Items.Insert(cntr,
-                            activeTms.ElementAt(cntr).name + " -+=* RING " +
-                            " RING *=+-");
-                        if (chklstTimers.CheckedIndices.Count == 0) {
+                        ringRingNeo(false, cntr);
+                        if (anyRunning(false, true)) {
                             tmrOneSec.Enabled = false;
                             tmrOneSec.Stop();
                         }
+                        playAudibleAlarm(false,
+                            activeTms.ElementAt(cntr).soundBite, cntr);
+                        /*
                         if (activeTms.ElementAt(cntr).soundBite == null) {
                             SystemSounds.Beep.Play();
                         } else {
@@ -550,8 +548,57 @@ namespace WindowsFormsApplication1
                             addTimer(cntr);
                             wplayer.controls.stop();
                         }
+                        */
                     }
                 }
+            }
+        }
+
+        private void playAudibleAlarm(Boolean alarm, string fn, int ndx) {
+            WMPLib.WindowsMediaPlayer wp =
+                new WMPLib.WindowsMediaPlayer();
+            wp.URL = fn;
+
+            //NOTE: A way to loop this audio until the button is pressed needs
+            //to be created
+            if (fn == null) {
+                SystemSounds.Beep.Play();
+            } else {
+                wp.controls.play();
+            }
+
+            if (alarm) {
+                MessageBox.Show(activeAls.ElementAt(ndx).name +
+                    ": -+=* Ring ring, Neo *=+-",
+                    activeAls.ElementAt(ndx).name + " Firing",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                chklstAlarms.Items.RemoveAt(ndx);
+                addAlarm(ndx);
+            } else {
+                MessageBox.Show(activeTms.ElementAt(ndx).name +
+                    ": -+=* Ring ring, Neo *=+-",
+                    activeTms.ElementAt(ndx).name + " Firing",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                chklstTimers.Items.RemoveAt(ndx);
+                addTimer(ndx);
+            }
+
+            wp.controls.stop();
+        }
+
+        private void ringRingNeo(Boolean alarm, int ndx) {
+            if (alarm) {
+                chklstAlarms.SetItemChecked(ndx, false);
+                chklstAlarms.Items.RemoveAt(ndx);
+                chklstAlarms.Items.Insert(ndx,
+                    activeAls.ElementAt(ndx).name + " -+=* RING " +
+                    " RING *=+-");
+            } else {
+                chklstTimers.SetItemChecked(ndx, false);
+                chklstTimers.Items.RemoveAt(ndx);
+                chklstTimers.Items.Insert(ndx,
+                    activeTms.ElementAt(ndx).name + " -+=* RING " +
+                    " RING *=+-");
             }
         }
 
@@ -844,6 +891,7 @@ namespace WindowsFormsApplication1
                 //don't forget to wipe and re-load alarms and timers here
                 //afterwards
             }
+
         }
     }
 }
