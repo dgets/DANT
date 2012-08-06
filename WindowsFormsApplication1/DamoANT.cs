@@ -47,6 +47,7 @@ using System.Media;
  * * Modularized code for checking if a timer, an alarm, or both are running
  * * Modularized code for unsetting an item in the timers or alarms list from
  *   _Tick
+ * * Finished modularizing _Tick routine 8/6/12
  */
 
 namespace WindowsFormsApplication1
@@ -145,18 +146,6 @@ namespace WindowsFormsApplication1
             } else {
                 return ouah;
             }
-            /*
-            if ((DateTime.Now >=
-                 new DateTime(DateTime.Now.Year, DateTime.Now.Month,
-                              DateTime.Now.Day, hr, min, sec))) {
-                //make it tomorrow
-                return (new DateTime(DateTime.Now.AddDays(1).Year,
-                        DateTime.Now.AddDays(1).Month,
-                        DateTime.Now.AddDays(1).Day, hr, min, sec));
-            } else {
-                return (new DateTime(DateTime.Now.Year, DateTime.Now.Month,
-                                 DateTime.Now.Day, hr, min, sec));
-            } */
         }
 
         private DateTime checkAlarmDay(int[] hrMinSec) {
@@ -288,37 +277,6 @@ namespace WindowsFormsApplication1
             return tmpTimes;
         }
 
-        /* private DateTime checkDate(int[] timeData) {
-            //refactor this shit as per George Dorn's suggestions
-            Boolean tmpFlag = false;
-            DateTime tDate = new DateTime();
-
-            if (timeData[0] < DateTime.Now.Hour) {
-                tmpFlag = true;
-            } else if ((timeData[0] == DateTime.Now.Hour) &&
-              (timeData[1] < DateTime.Now.Minute)) {
-                tmpFlag = true;
-            } else if ((timeData[0] == DateTime.Now.Hour) &&
-                       (timeData[1] == DateTime.Now.Minute) &&
-                       (timeData[2] < DateTime.Now.Second)) {
-                tmpFlag = true;
-            }
-            if (tmpFlag) {
-                tDate =
-                    new DateTime(DateTime.Now.AddDays(1).Year,
-                        DateTime.Now.AddDays(1).Month,
-                        DateTime.Now.AddDays(1).Day, timeData[0],
-                        timeData[1], timeData[2]);
-            } else {
-                tDate =
-                    new DateTime(DateTime.Now.Year,
-                        DateTime.Now.Month,
-                        DateTime.Now.Day, timeData[0], timeData[1], 
-                        timeData[2]);
-            }
-            return tDate;
-        } */
-
         private Boolean loadAlarmsTimers() {
             if (!File.Exists(cfgFile)) {
                 if (debugging) {
@@ -361,9 +319,6 @@ namespace WindowsFormsApplication1
                     activeAls.Add(tmpEntry);
                     addAlarm(aCntr++);
                 } else if (rawFields[0].CompareTo("T") == 0) {
-                    //we're working with a timer here
-                    //MessageBox.Show("Timer unimplemented as of now");
-
                     tmpTimeData = convertSavedFields(rawFields);
 
                     tmpEntry.name = rawFields[1];
@@ -374,7 +329,6 @@ namespace WindowsFormsApplication1
 
                     activeTms.Add(tmpEntry);
                     addTimer(tCntr++);
-                    //return false;
                 } else {
                     //serious garbled file issues
                     MessageBox.Show("Issue parsing config file!",
@@ -442,6 +396,11 @@ namespace WindowsFormsApplication1
 
         //modularize the SHIT out of this, goddamn it
         private void tmrOneSec_Tick(object sender, EventArgs e) {
+            tickDoAlarms();
+            tickDoTimers();
+        }
+
+        private void tickDoAlarms() {
             //alarms
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
                 if (!chklstAlarms.GetItemChecked(cntr)) {
@@ -453,14 +412,8 @@ namespace WindowsFormsApplication1
                 }
 
                 if (chklstAlarms.GetItemChecked(cntr)) {
-                    activeAls.ElementAt(cntr).running = true;
-                    activeAls.ElementAt(cntr).target = 
-                        checkAlarmDay(
-                            (int)activeAls.ElementAt(cntr).target.Hour,
-                            (int)activeAls.ElementAt(cntr).target.Minute,
-                            (int)activeAls.ElementAt(cntr).target.Second);
-                    activeAls.ElementAt(cntr).autoSetInterval();
-
+                    //like how the parameters are swapped?  fix that shit
+                    checkAlTmSetInterval(true, cntr);
                     updateDisplay(cntr, true);
 
                     if (activeAls.ElementAt(cntr).checkIfFiring()) {
@@ -475,27 +428,12 @@ namespace WindowsFormsApplication1
                         }
                         playAudibleAlarm(false,
                             activeAls.ElementAt(cntr).soundBite, cntr);
-                        /* if (activeAls.ElementAt(cntr).soundBite == null) {
-                            SystemSounds.Beep.Play();
-                        } else {
-                            WMPLib.WindowsMediaPlayer wplayer =
-                                new WMPLib.WindowsMediaPlayer();
-                            wplayer.URL = activeAls.ElementAt(cntr).soundBite;
-                            wplayer.controls.play();
-
-                            MessageBox.Show(activeAls.ElementAt(cntr).name +
-                                ": -+=* Ring ring, Neo *=+-",
-                                activeAls.ElementAt(cntr).name + " Firing",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Exclamation);
-                            chklstAlarms.Items.RemoveAt(cntr);
-                            addAlarm(cntr);
-                            wplayer.controls.stop();
-                        } */
                     }
                 }
             }
+        }
 
+        private void tickDoTimers() {
             //timers -- obviously this needs to be modularized
             for (int cntr = 0; cntr < activeTms.Count; cntr++) {
                 if (!chklstTimers.GetItemChecked(cntr)) {
@@ -507,14 +445,8 @@ namespace WindowsFormsApplication1
                 }
 
                 if (chklstTimers.GetItemChecked(cntr)) {
-                    activeTms.ElementAt(cntr).running = true;
-                    //problem in the next statement causing mistiming?
-                    activeTms.ElementAt(cntr).target =
-                        checkAlarmDay(
-                            (int)activeTms.ElementAt(cntr).target.Hour,
-                            (int)activeTms.ElementAt(cntr).target.Minute,
-                            (int)activeTms.ElementAt(cntr).target.Second);
-                    activeTms.ElementAt(cntr).autoSetInterval();
+                    //like how the parameters are swapped?  FIX THAT SHIT
+                    checkAlTmSetInterval(false, cntr);
 
                     updateDisplay(cntr, false);
 
@@ -530,27 +462,28 @@ namespace WindowsFormsApplication1
                         }
                         playAudibleAlarm(false,
                             activeTms.ElementAt(cntr).soundBite, cntr);
-                        /*
-                        if (activeTms.ElementAt(cntr).soundBite == null) {
-                            SystemSounds.Beep.Play();
-                        } else {
-                            WMPLib.WindowsMediaPlayer wplayer =
-                                new WMPLib.WindowsMediaPlayer();
-                            wplayer.URL = activeTms.ElementAt(cntr).soundBite;
-                            wplayer.controls.play();
-
-                            MessageBox.Show(activeTms.ElementAt(cntr).name +
-                                ": -+=* Ring ring, Neo *=+-",
-                                activeTms.ElementAt(cntr).name + " Firing",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Exclamation);
-                            chklstTimers.Items.RemoveAt(cntr);
-                            addTimer(cntr);
-                            wplayer.controls.stop();
-                        }
-                        */
                     }
                 }
+            }
+        }
+
+        private void checkAlTmSetInterval(Boolean alarm, int cntr) {
+            if (alarm) {
+                activeAls.ElementAt(cntr).running = true;
+                activeAls.ElementAt(cntr).target =
+                    checkAlarmDay(
+                        (int)activeAls.ElementAt(cntr).target.Hour,
+                        (int)activeAls.ElementAt(cntr).target.Minute,
+                        (int)activeAls.ElementAt(cntr).target.Second);
+                activeAls.ElementAt(cntr).autoSetInterval();
+            } else {
+                activeTms.ElementAt(cntr).running = true;
+                activeTms.ElementAt(cntr).target =
+                    checkAlarmDay(
+                        (int)activeTms.ElementAt(cntr).target.Hour,
+                        (int)activeTms.ElementAt(cntr).target.Minute,
+                        (int)activeTms.ElementAt(cntr).target.Second);
+                activeTms.ElementAt(cntr).autoSetInterval();
             }
         }
 
