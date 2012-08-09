@@ -48,6 +48,9 @@ using System.Media;
  * * Modularized code for unsetting an item in the timers or alarms list from
  *   _Tick
  * * Finished modularizing _Tick routine 8/6/12
+ * * Starting on writing proper method documentation 8/9/12
+ * * Modularized the alarm/timer name graying and numeric up/down resetting
+ *   code
  */
 
 namespace WindowsFormsApplication1
@@ -60,6 +63,9 @@ namespace WindowsFormsApplication1
         private String cfgFile;
         public frmEditWindow editWindow = null;
         
+        /*
+         * Constructor for the frmDamoANTs form
+         */
         public frmDamoANTs() { 
             String ouah;
 
@@ -74,7 +80,12 @@ namespace WindowsFormsApplication1
             }
         }
 
-        /*  --==** ALARM/TIMER CLASS **==-- */
+        /*
+         * AlarmsTimers class definition; still debating whether or not to
+         * split this up and make different Alarms/Timers classes; if not
+         * handling it for this beta, then certainly for the first real
+         * release or next release.
+         */
         public partial class AlarmsTimers {
             public String name;
             public DateTime target;
@@ -84,7 +95,9 @@ namespace WindowsFormsApplication1
             public Boolean alarm;
             public DateTime tmpTarget;
 
-            //method correctly sets interval for an alarm
+            //method sets interval for an alarm; allegedly for a timer as
+            //well, although this could be where the fuggup is occuring
+            //when attempts are made to do timers & alarms simultaneously
             public void autoSetInterval() {
                 if (alarm) {
                     interval = target - DateTime.Now;
@@ -93,7 +106,9 @@ namespace WindowsFormsApplication1
                 }
             }
 
-            //method determines whether alarm/timer is 'firing' or not
+            /* 
+             * method determines whether alarm/timer is 'firing' or not
+             */
             public Boolean checkIfFiring() {
                 if (debugging) {
                     Console.WriteLine("Checking if firing\nRunning value for: " +
@@ -111,6 +126,10 @@ namespace WindowsFormsApplication1
                 }
             }
 
+            /*
+             * Method returns unicode zero-padded xx:xx:xx format time
+             * interval remaining in the countdown
+             */
             public String returnCountdown() {
                 String tmpHr, tmpMin, tmpSec;
 
@@ -134,6 +153,12 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method checks the validity of the time/date object that holds the
+         * target time [alarm] or interval [timer--kludge] for the particular
+         * item; obviously the total need for this needs to be factored out.
+         * The potentially updated item is the return value.
+         */
         private DateTime checkAlarmDay(int hr, int min, int sec) {
             //check to see if alarm is for tomorrow
             //goddamn this needs to be refactored to just utilize the
@@ -148,6 +173,10 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Overloaded method that does the same as the above, but taking 
+         * parameters passed as an array.
+         */
         private DateTime checkAlarmDay(int[] hrMinSec) {
             DateTime ouah = new DateTime(DateTime.Now.Year, DateTime.Now.Month,
                 DateTime.Now.Day, hrMinSec[0], hrMinSec[1], hrMinSec[2]);
@@ -159,6 +188,10 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method for adding a new alarm to the List and form objects through
+         * button click.
+         */
         private void btnAddAlarm_Click(object sender, EventArgs e) {
             //verify that name box is not still full of default value
             if (txtAlarmName.Text.CompareTo("Alarm Name Here") == 0) {
@@ -182,10 +215,7 @@ namespace WindowsFormsApplication1
                                             (int)numAlarmSec.Value);
             tmpAlarm.name = txtAlarmName.Text;
 
-            //reset textbox & numericUpDowns
-            txtAlarmName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
-            txtAlarmName.Text = "Alarm Name Here";
-            numAlarmHr.Value = 0; numAlarmMin.Value = 0; numAlarmSec.Value = 0;
+            grayItemNameBoxNResetNumerics(true);
 
             //add it to the list
             activeAls.Add(tmpAlarm);
@@ -194,7 +224,31 @@ namespace WindowsFormsApplication1
             addAlarm(activeAls.IndexOf(tmpAlarm));
             saveAlarmsTimers();
         }
-        
+
+        /*
+         * Method grays out and resets text for the timer/alarm name, also
+         * resets the respective numeric up/down controls back to 0.
+         */
+        private void grayItemNameBoxNResetNumerics(Boolean alarm) {
+            if (alarm) {
+                txtAlarmName.ForeColor = 
+                    System.Drawing.SystemColors.InactiveCaption;
+                txtAlarmName.Text = "Alarm Name Here";
+                numAlarmHr.Value = 0; numAlarmMin.Value = 0; 
+                numAlarmSec.Value = 0;
+            } else {
+                txtTimerName.ForeColor = 
+                    System.Drawing.SystemColors.InactiveCaption;
+                txtTimerName.Text = "Timer Name Here";
+                numTimerHr.Value = 0; numTimerMin.Value = 0; 
+                numTimerSec.Value = 0;
+            }
+        }
+
+        /*
+         * Method writes all of the current alarms and timers to the config
+         * file.
+         */
         private Boolean saveAlarmsTimers() {
             int cntr;
 
@@ -212,11 +266,7 @@ namespace WindowsFormsApplication1
                     Console.WriteLine("Adding activeAls[" + cntr.ToString() +
                         "] to save file . . .");
                 } try {
-                    cFile.WriteLine("A," + activeAls[cntr].name + "," +
-                        activeAls[cntr].target.Hour + "," + 
-                        activeAls[cntr].target.Minute + "," +
-                        activeAls[cntr].target.Second + "," +
-                        activeAls[cntr].soundBite);
+                    cFile.WriteLine(createCfgCSVString(true, cntr));
                 } catch {
                     MessageBox.Show("Error adding activeAls[" +
                         cntr.ToString() + "]!");
@@ -227,11 +277,7 @@ namespace WindowsFormsApplication1
                     Console.WriteLine("Adding activeTms[" + cntr.ToString() +
                         "] to save file . . .");
                 } try {
-                    cFile.WriteLine("T," + activeTms[cntr].name + "," +
-                        activeTms[cntr].target.Hour + "," +
-                        activeTms[cntr].target.Minute + "," +
-                        activeTms[cntr].target.Second + "," +
-                        activeTms[cntr].soundBite);
+                    cFile.WriteLine(createCfgCSVString(false, cntr));
                 } catch {
                     MessageBox.Show("Error adding activeTms[" +
                         cntr.ToString() + "]!");
@@ -241,6 +287,30 @@ namespace WindowsFormsApplication1
             return true;
         }
 
+        /*
+         * Method creates a CSV formatted string suitable for saving in the
+         * cfg file for each specified alarm or timer entry.
+         */
+        private string createCfgCSVString(Boolean alarm, int cntr) {
+            if (alarm) {
+                return ("A," + activeAls[cntr].name + "," +
+                    activeAls[cntr].target.Hour + "," +
+                    activeAls[cntr].target.Minute + "," +
+                    activeAls[cntr].target.Second + "," +
+                    activeAls[cntr].soundBite);
+            } else {
+                return ("T," + activeTms[cntr].name + "," +
+                    activeTms[cntr].target.Hour + "," +
+                    activeTms[cntr].target.Minute + "," +
+                    activeTms[cntr].target.Second + "," +
+                    activeTms[cntr].soundBite);
+            }
+        }
+
+        /*
+         * Method splits a line of what should be the CSV cfg file and
+         * returns the individual strings in an array
+         */
         private String[] parseSavedFieldsLine(String rawLine) {
             String[] rawFields;
 
@@ -254,6 +324,12 @@ namespace WindowsFormsApplication1
             return rawFields;
         }
 
+        /*
+         * Method converts the appropriate array items from the
+         * parseSavedFields() method into their integer counterparts and
+         * returns them in an array for inclusion into whatever DateTime or
+         * interval object is appropriate
+         */
         private int[] convertSavedFields(String[] rawFields) {
             int[] tmpTimes = {0, 0, 0};
             Boolean tmpFlag = false;    //try to find out a better way to do
@@ -277,6 +353,11 @@ namespace WindowsFormsApplication1
             return tmpTimes;
         }
 
+        /*
+         * LEFT OFF DOCUMENTATION HERE
+         * 
+         * NEED TO MODULARIZE THIS AND CONTINUE DOCUMENTATION
+         */
         private Boolean loadAlarmsTimers() {
             if (!File.Exists(cfgFile)) {
                 if (debugging) {
@@ -721,9 +802,10 @@ namespace WindowsFormsApplication1
             tmpTimer.soundBite = soundByteSelection();
 
             //reset textbox & numericUpDowns
-            txtTimerName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
+            /* txtTimerName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
             txtTimerName.Text = "Timer Name Here";
-            numTimerHr.Value = 0; numTimerMin.Value = 0; numTimerSec.Value = 0;
+            numTimerHr.Value = 0; numTimerMin.Value = 0; numTimerSec.Value = 0; */
+            grayItemNameBoxNResetNumerics(false);
 
             //add it to the list
             activeTms.Add(tmpTimer);
@@ -824,6 +906,10 @@ namespace WindowsFormsApplication1
                 //don't forget to wipe and re-load alarms and timers here
                 //afterwards
             }
+
+        }
+
+        private void btnToastTimer_Click(object sender, EventArgs e) {
 
         }
     }

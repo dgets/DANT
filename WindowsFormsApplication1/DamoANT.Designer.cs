@@ -261,6 +261,7 @@
             this.btnToastTimer.TabIndex = 13;
             this.btnToastTimer.Text = "Wipe Timer";
             this.btnToastTimer.UseVisualStyleBackColor = true;
+            this.btnToastTimer.Click += new System.EventHandler(this.btnToastTimer_Click);
             // 
             // lblTimerName
             // 
