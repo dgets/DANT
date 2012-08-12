@@ -51,6 +51,9 @@ using System.Media;
  * * Starting on writing proper method documentation 8/9/12
  * * Modularized the alarm/timer name graying and numeric up/down resetting
  *   code
+ * * Modularized multiple methods throughout the rest of the code (left one
+ *   or two that need more breaking up for later), finished documentation for
+ *   the rest of the existing code
  */
 
 namespace WindowsFormsApplication1
@@ -95,9 +98,11 @@ namespace WindowsFormsApplication1
             public Boolean alarm;
             public DateTime tmpTarget;
 
-            //method sets interval for an alarm; allegedly for a timer as
-            //well, although this could be where the fuggup is occuring
-            //when attempts are made to do timers & alarms simultaneously
+            /* 
+             * Method sets interval for an alarm; allegedly for a timer as
+             * well, although this could be where the fuggup is occuring
+             * when attempts are made to do timers & alarms simultaneously
+             */
             public void autoSetInterval() {
                 if (alarm) {
                     interval = target - DateTime.Now;
@@ -354,64 +359,37 @@ namespace WindowsFormsApplication1
         }
 
         /*
-         * LEFT OFF DOCUMENTATION HERE
-         * 
-         * NEED TO MODULARIZE THIS AND CONTINUE DOCUMENTATION
+         * Method attempts to load the alarms & timers config file, checking
+         * for file corruption, incorrect permissions, and for file existance;
+         * Method adds any found alarms or timers to the appropriate global
+         * List objects and returns 'true' if no errors are found or 'false'
+         * on finding any garbled data
          */
         private Boolean loadAlarmsTimers() {
-            if (!File.Exists(cfgFile)) {
-                if (debugging) {
-                    Console.WriteLine("Empty or nonexistant config file " +
-                        "detected");
-                }
-                return true;    //not an error condition
-            }
-
             String[] rawFile;
-            int aCntr = 0, tCntr = 0;
-
-            try {
-                rawFile = System.IO.File.ReadAllLines(cfgFile); //no need4close
-            } catch {
-                MessageBox.Show("There was an error reading " + cfgFile +
-                    ", aborting.");
+            int aCntr = 0, tCntr = 0; 
+            
+            if (chkCfg()) { return true; }
+            rawFile = readCfg();
+            if (rawFile == null) {
                 return false;
             }
 
             foreach (String raw in rawFile) {
                 String[] rawFields;
-                int[] tmpTimeData;
                 AlarmsTimers tmpEntry = new AlarmsTimers();
 
                 rawFields = parseSavedFieldsLine(raw);
-                if (rawFields[0] == null) {
-                    //DOH!
-                    break;
-                } else if (rawFields[0].CompareTo("A") == 0) {   //alarm
-                    tmpTimeData = convertSavedFields(rawFields);
-
-                    //add to active alarms
-                    tmpEntry.name = rawFields[1];
-                    tmpEntry.running = false;
-                    tmpEntry.target = checkAlarmDay(tmpTimeData);
-                    tmpEntry.soundBite = rawFields[5];
-                    tmpEntry.alarm = true;
-
+                tmpEntry = createTmpEntry(rawFields);
+                if (tmpEntry == null) { 
+                    break; 
+                } else if (rawFields[0].CompareTo("A") == 0) {
                     activeAls.Add(tmpEntry);
                     addAlarm(aCntr++);
                 } else if (rawFields[0].CompareTo("T") == 0) {
-                    tmpTimeData = convertSavedFields(rawFields);
-
-                    tmpEntry.name = rawFields[1];
-                    tmpEntry.running = false;
-                    tmpEntry.target = checkAlarmDay(tmpTimeData);
-                    tmpEntry.soundBite = rawFields[5];
-                    tmpEntry.alarm = false;
-
                     activeTms.Add(tmpEntry);
                     addTimer(tCntr++);
                 } else {
-                    //serious garbled file issues
                     MessageBox.Show("Issue parsing config file!",
                         "Cannot Parse DANT.cfg", MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
@@ -420,27 +398,88 @@ namespace WindowsFormsApplication1
             return true;
         }
 
+        /*
+         * Method reads the config file and returns an array of strings
+         * representing the data found in the file or returns null if
+         * file was not readable for some reason
+         */
+        private string[] readCfg() {
+            try {
+                return System.IO.File.ReadAllLines(cfgFile);
+            } catch {
+                MessageBox.Show("There was an error reading " + cfgFile +
+                    ", aborting.");
+                return null;
+            }
+        }
+
+        /*
+         * Method checks for the existance of the config file; returns
+         * true if nonexistent (probably not the most intuitive)
+         */
+        private Boolean chkCfg() {
+            if (!File.Exists(cfgFile)) {
+                if (debugging) {
+                    Console.WriteLine("Empty or nonexistant config file " +
+                        "detected");
+                }
+                return true;    //not an error condition
+            } else { return false; }
+        }
+
+        /*
+         * Method parses split field data from the config file into a
+         * temporary AlarmsTimers object and returns that value
+         */
+        private AlarmsTimers createTmpEntry(string[] fields) {
+            if (fields[0] == null) { return null; }
+
+            AlarmsTimers tmp = new AlarmsTimers();
+
+            tmp.name = fields[1];
+            tmp.running = false;
+            tmp.target = checkAlarmDay(convertSavedFields(fields));
+            tmp.soundBite = fields[5];
+            if (fields[0].CompareTo("A") == 0) {
+                tmp.alarm = true;
+            } else {
+                tmp.alarm = false;
+            }
+
+            return tmp;
+        }
+
+        /*
+         * Method adds alarm to appropriate checklist
+         */
         private void addAlarm(int alarmNo) {
             chklstAlarms.Items.Insert(alarmNo,
                 (activeAls.ElementAt(alarmNo).name + " -> " +
                  addZeroesToTime(activeAls.ElementAt(alarmNo).target)));
         }
 
+        /*
+         * Method adds timer to appropriate checklist
+         */
         private void addTimer(int timerNo) {
             chklstTimers.Items.Insert(timerNo,
                 (activeTms.ElementAt(timerNo).name + " -> " +
                  addZeroesToTime(activeTms.ElementAt(timerNo).target)));
         }
 
-        private void chklstAlarms_CheckedChanged(object sender, ItemCheckEventArgs e) {
-            if (debugging) {
-                Console.WriteLine("activeAls.Count: " + activeAls.Count.ToString() +
-                    "e.Index: " + e.Index.ToString() + "e.NewValue.ToString(): " +
-                    e.NewValue.ToString());
-            }
-        }
+        //private void chklstAlarms_CheckedChanged(object sender, ItemCheckEventArgs e) {
+        //    if (debugging) {
+        //        Console.WriteLine("activeAls.Count: " + activeAls.Count.ToString() +
+        //            "e.Index: " + e.Index.ToString() + "e.NewValue.ToString(): " +
+        //            e.NewValue.ToString());
+        //    }
+        //}
 
-        //originally created as modularization for _Tick
+        /*
+         * Method unsets a specified index number from the appropriate List
+         * object, and proceeds to handle unsetting the item and fixing the
+         * display in the checklist properly as well
+         */
         private void unsetItem(int ndx, Boolean alarm) {
             if (alarm) {
                 activeAls.ElementAt(ndx).running = false;
@@ -459,6 +498,10 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method updates the display for specified index for the appropriate
+         * checklist while counting down
+         */
         private void updateDisplay(int ndx, Boolean alarm) {
             if (alarm) {
                 chklstAlarms.Items.RemoveAt(ndx);
@@ -475,14 +518,20 @@ namespace WindowsFormsApplication1
             }
         }
 
-        //modularize the SHIT out of this, goddamn it
+        /*
+         * Method activates once every second as per our Timer object's
+         * settings and handles countdowns and firing of alarms, etc
+         */
         private void tmrOneSec_Tick(object sender, EventArgs e) {
             tickDoAlarms();
             tickDoTimers();
         }
 
+        /*
+         * Method is the once-per-second invocation that runs through the
+         * countdown procedure and testing for firing for all alarms
+         */
         private void tickDoAlarms() {
-            //alarms
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
                 if (!chklstAlarms.GetItemChecked(cntr)) {
                     if (debugging) {
@@ -514,8 +563,11 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method is the once-per-second invocation that runs through the
+         * countdown procedure and testing for firing for all timers
+         */
         private void tickDoTimers() {
-            //timers -- obviously this needs to be modularized
             for (int cntr = 0; cntr < activeTms.Count; cntr++) {
                 if (!chklstTimers.GetItemChecked(cntr)) {
                     if (debugging) {
@@ -548,26 +600,39 @@ namespace WindowsFormsApplication1
             }
         }
 
-        private void checkAlTmSetInterval(Boolean alarm, int cntr) {
+        /*
+         * Method sets alarm/timer to running, verifies that the TimeDate
+         * property of the appropriate List item is valid, and calls 
+         * autoSetInterval() to do counting down
+         * NOTE: checking the TimeDate property every time the interval
+         * is set is redundant, and this should be made less stupid, as well
+         * as the setting of the running property to 'true' repeatedly
+         */
+        private void checkAlTmSetInterval(Boolean alarm, int ndx) {
             if (alarm) {
-                activeAls.ElementAt(cntr).running = true;
-                activeAls.ElementAt(cntr).target =
+                activeAls.ElementAt(ndx).running = true;
+                activeAls.ElementAt(ndx).target =
                     checkAlarmDay(
-                        (int)activeAls.ElementAt(cntr).target.Hour,
-                        (int)activeAls.ElementAt(cntr).target.Minute,
-                        (int)activeAls.ElementAt(cntr).target.Second);
-                activeAls.ElementAt(cntr).autoSetInterval();
+                        (int)activeAls.ElementAt(ndx).target.Hour,
+                        (int)activeAls.ElementAt(ndx).target.Minute,
+                        (int)activeAls.ElementAt(ndx).target.Second);
+                activeAls.ElementAt(ndx).autoSetInterval();
             } else {
-                activeTms.ElementAt(cntr).running = true;
-                activeTms.ElementAt(cntr).target =
+                activeTms.ElementAt(ndx).running = true;
+                activeTms.ElementAt(ndx).target =
                     checkAlarmDay(
-                        (int)activeTms.ElementAt(cntr).target.Hour,
-                        (int)activeTms.ElementAt(cntr).target.Minute,
-                        (int)activeTms.ElementAt(cntr).target.Second);
-                activeTms.ElementAt(cntr).autoSetInterval();
+                        (int)activeTms.ElementAt(ndx).target.Hour,
+                        (int)activeTms.ElementAt(ndx).target.Minute,
+                        (int)activeTms.ElementAt(ndx).target.Second);
+                activeTms.ElementAt(ndx).autoSetInterval();
             }
         }
 
+        /*
+         * Method plays the audible alarm specified in the respective List
+         * object and waits for user interaction to remove the item from
+         * active status, etc
+         */
         private void playAudibleAlarm(Boolean alarm, string fn, int ndx) {
             WMPLib.WindowsMediaPlayer wp =
                 new WMPLib.WindowsMediaPlayer();
@@ -596,10 +661,12 @@ namespace WindowsFormsApplication1
                 chklstTimers.Items.RemoveAt(ndx);
                 addTimer(ndx);
             }
-
             wp.controls.stop();
         }
 
+        /*
+         * Method sets respective checklist text to 'ring ring, neo'
+         */
         private void ringRingNeo(Boolean alarm, int ndx) {
             if (alarm) {
                 chklstAlarms.SetItemChecked(ndx, false);
@@ -621,6 +688,10 @@ namespace WindowsFormsApplication1
             this.BeginInvoke(new MethodInvoker(checkActiveAlarms), null);
         }
 
+        /*
+         * Method checks whether or not any alarms, timers, or both are
+         * running
+         */
         private Boolean anyRunning(Boolean onlyAlarms, Boolean checkAll) {
             if (checkAll) {
                 if ((chklstAlarms.CheckedIndices.Count == 0) &&
@@ -644,6 +715,12 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method checks all active alarms to see if the primary timer needs
+         * to be shut off, checks the DateTime property for validity, and
+         * enables the primary timer if it has not already been activated and
+         * is needed
+         */
         private void checkActiveAlarms() {
             if (debugging) {
                 Console.WriteLine("Firing chklstAlarms_Clicked");
@@ -680,6 +757,9 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method wipes text from the alarm name textbox (ready for input)
+         */
         private void txtAlarmName_Enter(object sender, EventArgs e) {
             if (txtAlarmName.Text.CompareTo("Alarm Name Here") == 0) {
                 txtAlarmName.Text = "";
@@ -687,6 +767,9 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method wipes text from the timer name textbox (ready for input)
+         */
         private void txtTimerName_Enter(object sender, EventArgs e) {
             if (txtTimerName.Text.CompareTo("Timer Name Here") == 0) {
                 txtTimerName.Text = "";
@@ -694,6 +777,10 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method grays out and fills in instruction text in the alarm name
+         * textbox
+         */
         private void txtAlarmName_Leave(object sender, EventArgs e) {
             if (txtAlarmName.Text.CompareTo("") == 0) {
                 txtAlarmName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
@@ -701,6 +788,10 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method grays out and fills in instruction text in the timer name
+         * textbox
+         */
         private void txtTimerName_Leave(object sender, EventArgs e) {
             if (txtTimerName.Text.CompareTo("") == 0) {
                 txtTimerName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
@@ -708,6 +799,10 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method is invoked when the Wipe Alarm button is clicked and 
+         * removes all necessary List/checklist items
+         */
         private void btnToastAlarm_Click(object sender, EventArgs e) {
             foreach (int ndx in chklstAlarms.CheckedIndices) {
                 //need to add code in here to stop timer from ticking if
@@ -718,6 +813,11 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method is invoked when the Edit Alarm button is clicked,
+         * verifies that an alarm is checked for editing, and if so, opens
+         * the appropriate editing form/winder
+         */
         private void btnEditAlarm_Click(object sender, EventArgs e) {
             if (chklstAlarms.CheckedIndices.Count == 0) {
                 MessageBox.Show("You must check an alarm before trying to " +
@@ -730,6 +830,10 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method is invoked when the edit form/winder is closed and changes
+         * were made necessitating updates to the proper objects
+         */
         public void editWindowMadeChanges(Boolean alarm, int ndx, String an,
             int hr, int min, int sec, String fn) {
             if (alarm) {
@@ -755,6 +859,10 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method pads single digit time entities with zeroes for more
+         * aesthetically proper display
+         */
         private String addZeroesToTime(DateTime ouah) {
             int hr, min, sec;
             String targetZeroesAdded;
@@ -782,6 +890,10 @@ namespace WindowsFormsApplication1
             return targetZeroesAdded;
         }
 
+        /*
+         * Method handles adding new timer data to the appropriate List
+         * objects and checklist
+         */
         private void btnAddTimer_Click(object sender, EventArgs e) {
             if (txtTimerName.Text.CompareTo("") == 0) {
                 MessageBox.Show("You must enter a timer name!",
@@ -801,10 +913,6 @@ namespace WindowsFormsApplication1
             tmpTimer.running = false;
             tmpTimer.soundBite = soundByteSelection();
 
-            //reset textbox & numericUpDowns
-            /* txtTimerName.ForeColor = System.Drawing.SystemColors.InactiveCaption;
-            txtTimerName.Text = "Timer Name Here";
-            numTimerHr.Value = 0; numTimerMin.Value = 0; numTimerSec.Value = 0; */
             grayItemNameBoxNResetNumerics(false);
 
             //add it to the list
@@ -815,6 +923,10 @@ namespace WindowsFormsApplication1
             saveAlarmsTimers();
         }
 
+        /*
+         * Method is invoked for selection of the user's choice of a sound
+         * file to be played when the alarm countdown is reached
+         */
         private String soundByteSelection() {
             String ouah;
 
@@ -828,6 +940,11 @@ namespace WindowsFormsApplication1
             return ouah;
         }
 
+        /*
+         * Method verifies that an alarm time of 00:00:00 is not an error and
+         * that the user wants it to go off at midnight, also if it is a
+         * timer, lets the user know that a duration of 00:00:00 is invalid
+         */
         private Boolean legitTime(int hr, int min, int sec, Boolean alarm) {
             if ((hr == 0) && (min == 0) && (sec == 0) && (alarm)) {
                 DialogResult rslt = MessageBox.Show("Use a time of " +
@@ -850,16 +967,24 @@ namespace WindowsFormsApplication1
             return true;
         }
 
+        /*
+         * Method is used to invoke appropriate method for issues that need
+         * to be handled when the user has futzed with the timers checklist
+         */
         private void chklstTimers_SelectedIndexChanged(object sender, EventArgs e) {
             this.BeginInvoke(new MethodInvoker(checkActiveTimers), null);
         }
 
+        /*
+         * Method turns off the primary timer if necessary (refactor that 
+         * out), enables the primary timer if necessary, and handles enabling
+         * the specific timer List object if it has been enabled by the user
+         */
         private void checkActiveTimers() {
             if (debugging) {
                 Console.WriteLine("Firing chklstTimers_Clicked");
             }
 
-            //refactor and move to its own func to check for alarms _&_ timers
             if (!anyRunning(false, true) && (tmrOneSec.Enabled == true)) {
                 //turn the timer off, por dios
                 tmrOneSec.Stop();
@@ -896,6 +1021,11 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /*
+         * Method is used to verify that a timer has been selected for 
+         * editing when the Edit Timer button is clicked, and for opening
+         * the appropriate form/winder to edit the data if necessary
+         */
         private void btnEditTimer_Click(object sender, EventArgs e) {
             if (chklstTimers.CheckedIndices.Count == 0) {
                 MessageBox.Show("You must check a timer before trying to " +
@@ -909,6 +1039,10 @@ namespace WindowsFormsApplication1
 
         }
 
+        /*
+         * Method is used to wipe specific timer List data when one is
+         * properly selected
+         */
         private void btnToastTimer_Click(object sender, EventArgs e) {
 
         }
