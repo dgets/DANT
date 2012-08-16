@@ -33,8 +33,6 @@ using System.Media;
  * * timer now sets interval correctly; however, the code for this is kludgy
  *   as hell due to using the same object <AlarmsTimers> for both sorts of
  *   items -- need to separate the class into one class for each
- * * Timers and Alarms are both working separately; however, when an alarm is
- *   checked and activated first the timer counts backward
  * * When a timer is checked first, alarms do not continue to count after the
  *   timer rings (check unsetting code in the ringing in _Tick)
  * * Need to make sure that any code looking for a running alarm/timer/both
@@ -53,7 +51,9 @@ using System.Media;
  *   code
  * * Modularized multiple methods throughout the rest of the code (left one
  *   or two that need more breaking up for later), finished documentation for
- *   the rest of the existing code
+ *   the rest of the existing code 8/16/12
+ * * Timers and Alarms now work concurrently; fixed active alarm/timer code to
+ *   only execute certain bits when needed to reduce overhead 8/16/12
  */
 
 namespace WindowsFormsApplication1
@@ -580,7 +580,6 @@ namespace WindowsFormsApplication1
                 if (chklstTimers.GetItemChecked(cntr)) {
                     //like how the parameters are swapped?  FIX THAT SHIT
                     checkAlTmSetInterval(false, cntr);
-
                     updateDisplay(cntr, false);
 
                     if (activeTms.ElementAt(cntr).checkIfFiring()) {
@@ -610,20 +609,29 @@ namespace WindowsFormsApplication1
          */
         private void checkAlTmSetInterval(Boolean alarm, int ndx) {
             if (alarm) {
-                activeAls.ElementAt(ndx).running = true;
-                activeAls.ElementAt(ndx).target =
-                    checkAlarmDay(
-                        (int)activeAls.ElementAt(ndx).target.Hour,
-                        (int)activeAls.ElementAt(ndx).target.Minute,
-                        (int)activeAls.ElementAt(ndx).target.Second);
+                if (activeAls.ElementAt(ndx).running == false) {
+                    activeAls.ElementAt(ndx).running = true;
+                    activeAls.ElementAt(ndx).target =
+                        checkAlarmDay(
+                            (int)activeAls.ElementAt(ndx).target.Hour,
+                            (int)activeAls.ElementAt(ndx).target.Minute,
+                            (int)activeAls.ElementAt(ndx).target.Second);
+                }
                 activeAls.ElementAt(ndx).autoSetInterval();
             } else {
-                activeTms.ElementAt(ndx).running = true;
-                activeTms.ElementAt(ndx).target =
-                    checkAlarmDay(
-                        (int)activeTms.ElementAt(ndx).target.Hour,
-                        (int)activeTms.ElementAt(ndx).target.Minute,
-                        (int)activeTms.ElementAt(ndx).target.Second);
+                if (activeTms.ElementAt(ndx).running == false) {
+                    activeTms.ElementAt(ndx).running = true;
+                    activeTms.ElementAt(ndx).tmpTarget =
+                        DateTime.Now.AddSeconds(
+                            (activeTms.ElementAt(ndx).target.Hour * 3600) +
+                            (activeTms.ElementAt(ndx).target.Minute * 60) +
+                            (activeTms.ElementAt(ndx).target.Second));
+                    if (debugging) {
+                        Console.WriteLine("tmpTarget for Timer #" +
+                            ndx.ToString() + " set to " +
+                            activeTms.ElementAt(ndx).tmpTarget.ToString());
+                    }
+                }
                 activeTms.ElementAt(ndx).autoSetInterval();
             }
         }
