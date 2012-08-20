@@ -11,7 +11,6 @@ using System.Media;
 
 /*
  * BUGS:
- * * Timers section is not fully implemented yet.
  * * need to save the selected state of a window between redrawings when an
  *   alarm is active - then 'selection' as opposed to 'checked' status needs
  *   to be used for non-activating events as this is annoying and not very
@@ -54,6 +53,7 @@ using System.Media;
  *   the rest of the existing code 8/16/12
  * * Timers and Alarms now work concurrently; fixed active alarm/timer code to
  *   only execute certain bits when needed to reduce overhead 8/16/12
+ * * Finished initial creation of Timers code; just need to debug it now 8/20
  */
 
 namespace WindowsFormsApplication1
@@ -833,8 +833,12 @@ namespace WindowsFormsApplication1
             } else {
                 editWindow = new frmEditWindow(this, true);
                 editWindow.Show();
-                //don't forget to wipe and re-load alarms and timers here
-                //afterwards
+
+                //no workee; timer keeps ticking
+                if (!anyRunning(false, true)) {
+                    tmrOneSec.Enabled = false;
+                    tmrOneSec.Stop();
+                }
             }
         }
 
@@ -849,6 +853,7 @@ namespace WindowsFormsApplication1
                 activeAls[ndx].target = new DateTime(DateTime.Now.Year,
                     DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
                 activeAls[ndx].soundBite = fn;
+                activeAls[ndx].running = false;
                 activeAls[ndx].autoSetInterval();
 
                 chklstAlarms.SetItemChecked(ndx, false);
@@ -857,6 +862,7 @@ namespace WindowsFormsApplication1
                 activeTms[ndx].target = new DateTime(DateTime.Now.Year,
                     DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
                 activeTms[ndx].soundBite = fn;
+                activeTms[ndx].running = false;
                 activeTms[ndx].autoSetInterval();
 
                 chklstTimers.SetItemChecked(ndx, false);
@@ -1041,10 +1047,13 @@ namespace WindowsFormsApplication1
             } else {
                 editWindow = new frmEditWindow(this, false);
                 editWindow.Show();
-                //don't forget to wipe and re-load alarms and timers here
-                //afterwards
-            }
 
+                //no workee; timer keeps ticking
+                if (!anyRunning(false, true)) {
+                    tmrOneSec.Enabled = false;
+                    tmrOneSec.Stop();
+                }
+            }
         }
 
         /*
@@ -1052,7 +1061,12 @@ namespace WindowsFormsApplication1
          * properly selected
          */
         private void btnToastTimer_Click(object sender, EventArgs e) {
-
+            foreach (int ndx in chklstTimers.CheckedIndices) {
+                //need to add code in here to stop timer from ticking if nec.
+                chklstTimers.Items.RemoveAt(ndx);
+                activeTms.RemoveAt(ndx);
+                saveAlarmsTimers();
+            }
         }
     }
 }
