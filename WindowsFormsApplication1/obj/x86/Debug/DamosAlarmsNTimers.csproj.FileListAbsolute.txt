@@ -51,3 +51,7 @@ C:\Users\Khelair\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\In
 C:\Users\Khelair\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.csproj.ResolveComReference.cache
 C:\Users\Khelair\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.frmEditWindow.resources
 C:\Users\Khelair\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\Interop.WMPLib.dll
+C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.csproj.ResolveComReference.cache
+C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.exe
+C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.pdb

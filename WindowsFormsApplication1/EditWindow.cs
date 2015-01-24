@@ -13,7 +13,7 @@ using System.Windows.Forms;
  *   an alarm or a timer
  */
 
-namespace WindowsFormsApplication1 {
+namespace DamosAlarmsNTimers {
     public partial class frmEditWindow : Form {
 
         private frmDamoANTs primaryWindow = null;

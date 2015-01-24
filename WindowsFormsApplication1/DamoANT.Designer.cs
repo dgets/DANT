@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApplication1
+﻿namespace DamosAlarmsNTimers
 {
     partial class frmDamoANTs
     {

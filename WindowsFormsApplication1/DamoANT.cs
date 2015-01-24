@@ -11,31 +11,7 @@ using System.Media;
 
 /*
  * BUGS:
- * * need to save the selected state of a window between redrawings when an
- *   alarm is active - then 'selection' as opposed to 'checked' status needs
- *   to be used for non-activating events as this is annoying and not very
- *   intuitive for the end user
- * * Wipe Alarm button doesn't stop timer from ticking -- modularize the code
- *   to check for timer/alarm tickingness because it needs to be used in
- *   several different places; nor does finishing the editing process for an
- *   alarm or timer
- * * When toggling one alarm from active to inactive and back, the alarm does
- *   not properly start the timer ticking and countdown again; this is not a
- *   problem when activating one then deactivating it, toggling another one, 
- *   and then coming back to the first one, though
- * * Refactor checkDate() as per George Dorn's instructions for more efficient
- *   and legible code (ie compare entire dates, not multiple DateTime.Nows)
- * * checkActiveTimers() & checkActiveAlarms() both need to be more modular
- * * alternating clicking between active timers and active alarms causes 
- *   bugs rendering the alarms, timers, or both, inactive even when properly
- *   checked
- * * timer now sets interval correctly; however, the code for this is kludgy
- *   as hell due to using the same object <AlarmsTimers> for both sorts of
- *   items -- need to separate the class into one class for each
- * * When a timer is checked first, alarms do not continue to count after the
- *   timer rings (check unsetting code in the ringing in _Tick)
- * * Need to make sure that any code looking for a running alarm/timer/both
- *   is utilizing the new modularized code for it
+ * * Now have been all relocated to GitHub/dgets repository issues
  */
 
 /*
@@ -54,9 +30,12 @@ using System.Media;
  * * Timers and Alarms now work concurrently; fixed active alarm/timer code to
  *   only execute certain bits when needed to reduce overhead 8/16/12
  * * Finished initial creation of Timers code; just need to debug it now 8/20
+ * 
+ * NOTE: Depreciating this in the comments now that revision information will
+ * be stored by default in GitHub repository
  */
 
-namespace WindowsFormsApplication1
+namespace DamosAlarmsNTimers
 {
     public partial class frmDamoANTs : Form
     {
