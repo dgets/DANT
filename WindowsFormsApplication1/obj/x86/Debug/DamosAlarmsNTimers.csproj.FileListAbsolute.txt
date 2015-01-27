@@ -55,3 +55,9 @@ C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\D
 C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.csproj.ResolveComReference.cache
 C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.exe
 C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.pdb
+C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\bin\Debug\DamosAlarmsNTimers.exe
+C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\bin\Debug\DamosAlarmsNTimers.pdb
+C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.frmDamoANTs.resources
+C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.frmEditWindow.resources
+C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.Properties.Resources.resources
+C:\Users\Domingo Sontag\Documents\GitHub\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.csproj.GenerateResource.Cache

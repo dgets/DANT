@@ -63,6 +63,40 @@ namespace DamosAlarmsNTimers
         }
 
         /*
+         * splitting up alarms & timers here, fo' sho' now
+         * Alarms first follow
+         */
+        public partial class Alarms {
+            public String name;
+            public DateTime ringAt;
+            public Boolean running;
+            public String soundBite;
+
+
+        }
+
+        /*
+         * Timers class follows
+         */
+        public partial class Timers {
+            public String name;
+            public DateTime tmpTarget;  /*this needs to be recalculated
+                                          after any pause; this is prolly
+                                          where the bugs before were
+                                          happening after pause */
+            private TimeSpan inteval;
+            public Boolean running;
+            public String soundBite;
+
+            public void autoSetInterval() {
+                interval = tmpTarget - DateTime.Now;
+            }
+
+
+
+        }
+
+        /*
          * AlarmsTimers class definition; still debating whether or not to
          * split this up and make different Alarms/Timers classes; if not
          * handling it for this beta, then certainly for the first real
