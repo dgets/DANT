@@ -71,8 +71,28 @@ namespace DamosAlarmsNTimers
             public DateTime ringAt;
             public Boolean running;
             public String soundBite;
+            public TimeSpan interval;  //may be phasing this out in here soon
 
+            public void setInterval() {
+                interval = ringAt - DateTime.Now;
+            }
 
+            public Boolean checkIfFiring() {
+                if (debugging) {
+                    Console.WriteLine("Checking if firing\nRunning value for: " +
+                        name + " is: " + running.ToString() + "\nSeconds " +
+                        "left: " + interval.TotalSeconds.ToString() + "\n" +
+                        "Target time: " + ringAt.ToShortTimeString());
+                }
+
+                if ((interval.TotalSeconds < 1) &&
+                    (interval.TotalSeconds > -1)) {
+                    running = false;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
 
         /*
@@ -84,15 +104,30 @@ namespace DamosAlarmsNTimers
                                           after any pause; this is prolly
                                           where the bugs before were
                                           happening after pause */
-            private TimeSpan inteval;
+            private TimeSpan interval;
             public Boolean running;
             public String soundBite;
 
-            public void autoSetInterval() {
+            public void setInterval() {
                 interval = tmpTarget - DateTime.Now;
             }
 
+            public Boolean checkIfFiring() {
+                if (debugging) {
+                    Console.WriteLine("Checking if firing\nRunning value for: " +
+                        name + " is: " + running.ToString() + "\nSeconds " +
+                        "left: " + interval.TotalSeconds.ToString() + "\n" +
+                        "Target time: " + tmpTarget.ToShortTimeString());
+                }
 
+                if ((interval.TotalSeconds < 1) &&
+                    (interval.TotalSeconds > -1)) {
+                    running = false;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
 
         }
 
@@ -116,17 +151,21 @@ namespace DamosAlarmsNTimers
              * well, although this could be where the fuggup is occuring
              * when attempts are made to do timers & alarms simultaneously
              */
+            /* 
+             * taking this out because it's been moved to the new separate
+             * classes
             public void autoSetInterval() {
                 if (alarm) {
                     interval = target - DateTime.Now;
                 } else {
                     interval = tmpTarget - DateTime.Now;
                 }
-            }
+            } */
 
             /* 
              * method determines whether alarm/timer is 'firing' or not
              */
+            /* got this one moved to separate classes now, too
             public Boolean checkIfFiring() {
                 if (debugging) {
                     Console.WriteLine("Checking if firing\nRunning value for: " +
@@ -142,7 +181,7 @@ namespace DamosAlarmsNTimers
                 } else {
                     return false;
                 }
-            }
+            } */
 
             /*
              * Method returns unicode zero-padded xx:xx:xx format time
