@@ -39,8 +39,8 @@ namespace DamosAlarmsNTimers
 {
     public partial class frmDamoANTs : Form
     {
-        public List<AlarmsTimers> activeAls = new List<AlarmsTimers>();
-        public List<AlarmsTimers> activeTms = new List<AlarmsTimers>();
+        public List<Alarms> activeAls = new List<Alarms>();
+        public List<Timers> activeTms = new List<Timers>();
         private const Boolean debugging = true;
         private String cfgFile;
         public frmEditWindow editWindow = null;
@@ -306,12 +306,12 @@ namespace DamosAlarmsNTimers
                 return;
             }
             
-            AlarmsTimers tmpAlarm = new AlarmsTimers();
+            Alarms tmpAlarm = new Alarms();
 
             tmpAlarm.soundBite = soundByteSelection();
 
             //check to see if alarm is for tomorrow, set other options
-            tmpAlarm.target = checkAlarmDay((int)numAlarmHr.Value,
+            tmpAlarm.ringAt = checkAlarmDay((int)numAlarmHr.Value,
                                             (int)numAlarmMin.Value,
                                             (int)numAlarmSec.Value);
             tmpAlarm.name = txtAlarmName.Text;
@@ -395,15 +395,15 @@ namespace DamosAlarmsNTimers
         private string createCfgCSVString(Boolean alarm, int cntr) {
             if (alarm) {
                 return ("A," + activeAls[cntr].name + "," +
-                    activeAls[cntr].target.Hour + "," +
-                    activeAls[cntr].target.Minute + "," +
-                    activeAls[cntr].target.Second + "," +
+                    activeAls[cntr].ringAt.Hour + "," +
+                    activeAls[cntr].ringAt.Minute + "," +
+                    activeAls[cntr].ringAt.Second + "," +
                     activeAls[cntr].soundBite);
             } else {
                 return ("T," + activeTms[cntr].name + "," +
-                    activeTms[cntr].target.Hour + "," +
-                    activeTms[cntr].target.Minute + "," +
-                    activeTms[cntr].target.Second + "," +
+                    activeTms[cntr].tmpTarget.Hour + "," +
+                    activeTms[cntr].tmpTarget.Minute + "," +
+                    activeTms[cntr].tmpTarget.Second + "," +
                     activeTms[cntr].soundBite);
             }
         }
@@ -473,17 +473,19 @@ namespace DamosAlarmsNTimers
 
             foreach (String raw in rawFile) {
                 String[] rawFields;
-                AlarmsTimers tmpEntry = new AlarmsTimers();
+                //not sure how to fix this just yet; it might require
+                //a change in the config file at this point, also
+                Alarms tmpAlarm = new Alarms();
+                Timers tmpTimer = new Timers();
 
                 rawFields = parseSavedFieldsLine(raw);
-                tmpEntry = createTmpEntry(rawFields);
-                if (tmpEntry == null) { 
+                if ((createTmpEntry(rawFields) == null)) { 
                     break; 
                 } else if (rawFields[0].CompareTo("A") == 0) {
-                    activeAls.Add(tmpEntry);
+                    activeAls.Add(tmpAlarm);
                     addAlarm(aCntr++);
                 } else if (rawFields[0].CompareTo("T") == 0) {
-                    activeTms.Add(tmpEntry);
+                    activeTms.Add(tmpTimer);
                     addTimer(tCntr++);
                 } else {
                     MessageBox.Show("Issue parsing config file!",
@@ -526,6 +528,11 @@ namespace DamosAlarmsNTimers
         /*
          * Method parses split field data from the config file into a
          * temporary AlarmsTimers object and returns that value
+         * 
+         * Due to splitting up the classes, this is going to have to
+         * be reworked significantly; probably resulting in a new
+         * temporary class or passing back things in an array.  
+         * Leaving off here on the 'doze machine for today
          */
         private AlarmsTimers createTmpEntry(string[] fields) {
             if (fields[0] == null) { return null; }
