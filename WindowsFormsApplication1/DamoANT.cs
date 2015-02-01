@@ -93,6 +93,28 @@ namespace DamosAlarmsNTimers
                     return false;
                 }
             }
+
+            public String returnCountdown() {
+                String tmpHr, tmpMin, tmpSec;
+
+                if (interval.Hours < 10) {
+                    tmpHr = "0" + interval.Hours.ToString();
+                } else {
+                    tmpHr = interval.Hours.ToString();
+                }
+                if (interval.Minutes < 10) {
+                    tmpMin = "0" + interval.Minutes.ToString();
+                } else {
+                    tmpMin = interval.Minutes.ToString();
+                }
+                if (interval.Seconds < 10) {
+                    tmpSec = "0" + interval.Seconds.ToString();
+                } else {
+                    tmpSec = interval.Seconds.ToString();
+                }
+
+                return (tmpHr + ":" + tmpMin + ":" + tmpSec);
+            }
         }
 
         /*
@@ -129,6 +151,27 @@ namespace DamosAlarmsNTimers
                 }
             }
 
+            public String returnCountdown() {
+                String tmpHr, tmpMin, tmpSec;
+
+                if (interval.Hours < 10) {
+                    tmpHr = "0" + interval.Hours.ToString();
+                } else {
+                    tmpHr = interval.Hours.ToString();
+                }
+                if (interval.Minutes < 10) {
+                    tmpMin = "0" + interval.Minutes.ToString();
+                } else {
+                    tmpMin = interval.Minutes.ToString();
+                }
+                if (interval.Seconds < 10) {
+                    tmpSec = "0" + interval.Seconds.ToString();
+                } else {
+                    tmpSec = interval.Seconds.ToString();
+                }
+
+                return (tmpHr + ":" + tmpMin + ":" + tmpSec);
+            }
         }
 
         /*
@@ -137,14 +180,14 @@ namespace DamosAlarmsNTimers
          * handling it for this beta, then certainly for the first real
          * release or next release.
          */
-        public partial class AlarmsTimers {
+        /* public partial class AlarmsTimers {
             public String name;
             public DateTime target;
             private TimeSpan interval;
             public Boolean running;
             public String soundBite;
             public Boolean alarm;
-            public DateTime tmpTarget;
+            public DateTime tmpTarget; */
 
             /* 
              * Method sets interval for an alarm; allegedly for a timer as
@@ -187,6 +230,7 @@ namespace DamosAlarmsNTimers
              * Method returns unicode zero-padded xx:xx:xx format time
              * interval remaining in the countdown
              */
+            /* now fully separated
             public String returnCountdown() {
                 String tmpHr, tmpMin, tmpSec;
 
@@ -207,8 +251,8 @@ namespace DamosAlarmsNTimers
                 }
 
                 return (tmpHr + ":" + tmpMin + ":" + tmpSec);
-            }
-        }
+            } */
+        //}
 
         /*
          * Method checks the validity of the time/date object that holds the
