@@ -552,6 +552,38 @@ namespace DamosAlarmsNTimers
             return tmp;
         }
 
+        private Alarms createTmpAlarm(string[] fields) {
+            if (fields[0] == null) { return null; }
+            if (fields[0].CompareTo("A") != 0) { return null; }
+            //the behavior above may not be needed after reimplemented
+            //from the calling code (where it would better live)
+
+            Alarms tmp = new Alarms();
+
+            tmp.name = fields[1];
+            tmp.running = false;
+            tmp.ringAt = checkAlarmDay(convertSavedFields(fields));
+            tmp.soundBite = fields[5];
+
+            return tmp;
+        }
+
+        private Timers createTmpTimer(string[] fields) {
+            if (fields[0] == null) { return null; }
+            if (fields[0].CompareTo("T") != 0) { return null; }
+            //again, this will be better implemented from the outside
+
+            Timers tmp = new Timers();
+
+            tmp.name = fields[1];
+            tmp.running = false;
+            tmp.tmpTarget = checkAlTmSetInterval();
+
+            //can't concentrate any more on this due to helplessly babbling
+            //little man
+
+        }
+
         /*
          * Method adds alarm to appropriate checklist
          */
