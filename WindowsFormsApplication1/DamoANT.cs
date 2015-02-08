@@ -533,6 +533,7 @@ namespace DamosAlarmsNTimers
          * be reworked significantly; probably resulting in a new
          * temporary class or passing back things in an array.  
          * Leaving off here on the 'doze machine for today
+        
          */
         private AlarmsTimers createTmpEntry(string[] fields) {
             if (fields[0] == null) { return null; }
@@ -574,10 +575,15 @@ namespace DamosAlarmsNTimers
             //again, this will be better implemented from the outside
 
             Timers tmp = new Timers();
+            TimeSpan ouah, ouah2;
 
             tmp.name = fields[1];
             tmp.running = false;
-            tmp.tmpTarget = checkAlTmSetInterval();
+            
+            ouah = new TimeSpan(0, fields[2], fields[3], fields[4]);
+            tmp.tmpTarget = TimeSpan(0, TimeSpan.FromHours(fields[2]),
+                                                    TimeSpan.FromHours(fields[3]),
+                                                    TimeSpan.FromMinutes(fields[4]));
 
             //can't concentrate any more on this due to helplessly babbling
             //little man
