@@ -572,22 +572,17 @@ namespace DamosAlarmsNTimers
         private Timers createTmpTimer(string[] fields) {
             if (fields[0] == null) { return null; }
             if (fields[0].CompareTo("T") != 0) { return null; }
-            //again, this will be better implemented from the outside
 
             Timers tmp = new Timers();
-            TimeSpan ouah, ouah2;
 
             tmp.name = fields[1];
             tmp.running = false;
             
-            ouah = new TimeSpan(0, fields[2], fields[3], fields[4]);
-            tmp.tmpTarget = TimeSpan(0, TimeSpan.FromHours(fields[2]),
-                                                    TimeSpan.FromHours(fields[3]),
-                                                    TimeSpan.FromMinutes(fields[4]));
+            tmp.tmpTarget = DateTime.Now + 
+                            new TimeSpan(0, int.Parse(fields[2]), int.Parse(fields[3]),
+                                int.Parse(fields[4]));
 
-            //can't concentrate any more on this due to helplessly babbling
-            //little man
-
+            return tmp;
         }
 
         /*
