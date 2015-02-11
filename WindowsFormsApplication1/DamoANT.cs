@@ -175,86 +175,6 @@ namespace DamosAlarmsNTimers
         }
 
         /*
-         * AlarmsTimers class definition; still debating whether or not to
-         * split this up and make different Alarms/Timers classes; if not
-         * handling it for this beta, then certainly for the first real
-         * release or next release.
-         */
-        /* public partial class AlarmsTimers {
-            public String name;
-            public DateTime target;
-            private TimeSpan interval;
-            public Boolean running;
-            public String soundBite;
-            public Boolean alarm;
-            public DateTime tmpTarget; */
-
-            /* 
-             * Method sets interval for an alarm; allegedly for a timer as
-             * well, although this could be where the fuggup is occuring
-             * when attempts are made to do timers & alarms simultaneously
-             */
-            /* 
-             * taking this out because it's been moved to the new separate
-             * classes
-            public void autoSetInterval() {
-                if (alarm) {
-                    interval = target - DateTime.Now;
-                } else {
-                    interval = tmpTarget - DateTime.Now;
-                }
-            } */
-
-            /* 
-             * method determines whether alarm/timer is 'firing' or not
-             */
-            /* got this one moved to separate classes now, too
-            public Boolean checkIfFiring() {
-                if (debugging) {
-                    Console.WriteLine("Checking if firing\nRunning value for: " +
-                        name + " is: " + running.ToString() + "\nSeconds " +
-                        "left: " + interval.TotalSeconds.ToString() + "\n" +
-                        "Target time: " + target.ToShortTimeString());
-                }
-
-                if ((interval.TotalSeconds < 1) &&
-                    (interval.TotalSeconds > -1)) {
-                    running = false;
-                    return true;
-                } else {
-                    return false;
-                }
-            } */
-
-            /*
-             * Method returns unicode zero-padded xx:xx:xx format time
-             * interval remaining in the countdown
-             */
-            /* now fully separated
-            public String returnCountdown() {
-                String tmpHr, tmpMin, tmpSec;
-
-                if (interval.Hours < 10) {
-                    tmpHr = "0" + interval.Hours.ToString();
-                } else {
-                    tmpHr = interval.Hours.ToString();
-                }
-                if (interval.Minutes < 10) {
-                    tmpMin = "0" + interval.Minutes.ToString();
-                } else {
-                    tmpMin = interval.Minutes.ToString();
-                }
-                if (interval.Seconds < 10) {
-                    tmpSec = "0" + interval.Seconds.ToString();
-                } else {
-                    tmpSec = interval.Seconds.ToString();
-                }
-
-                return (tmpHr + ":" + tmpMin + ":" + tmpSec);
-            } */
-        //}
-
-        /*
          * Method checks the validity of the time/date object that holds the
          * target time [alarm] or interval [timer--kludge] for the particular
          * item; obviously the total need for this needs to be factored out.
@@ -580,7 +500,7 @@ namespace DamosAlarmsNTimers
             
             tmp.tmpTarget = DateTime.Now + 
                             new TimeSpan(0, int.Parse(fields[2]), int.Parse(fields[3]),
-                                int.Parse(fields[4]));
+                                         int.Parse(fields[4]));
 
             return tmp;
         }
