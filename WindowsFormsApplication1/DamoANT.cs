@@ -999,15 +999,23 @@ namespace DamosAlarmsNTimers
          */
         private String soundByteSelection() {
             String ouah;
+            DialogResult whatev;
 
-            DialogResult whatev = openSoundFile.ShowDialog();
-            while (whatev != DialogResult.OK) {
+            whatev = MessageBox.Show("Use the console beep?", "Beep or Media File",
+                                     MessageBoxButtons.YesNo);
+
+            if (whatev == DialogResult.Yes) {
+                return null;
+            } else {
                 whatev = openSoundFile.ShowDialog();
+                while (whatev != DialogResult.OK) {
+                    whatev = openSoundFile.ShowDialog();
+                }
+
+                ouah = openSoundFile.FileName;
+
+                return ouah;
             }
-
-            ouah = openSoundFile.FileName;
-
-            return ouah;
         }
 
         /*
@@ -1079,9 +1087,9 @@ namespace DamosAlarmsNTimers
                              * one for each sort of list to avoid this kludge*/
                             activeTms.ElementAt(temp).tmpTarget =
                                 DateTime.Now.AddSeconds(
-                                    (activeTms.ElementAt(temp).target.Hour * 3600) +
-                                    (activeTms.ElementAt(temp).target.Minute * 60) +
-                                    (activeTms.ElementAt(temp).target.Second));
+                                    (activeTms.ElementAt(temp).tmpTarget.Hour * 3600) +
+                                    (activeTms.ElementAt(temp).tmpTarget.Minute * 60) +
+                                    (activeTms.ElementAt(temp).tmpTarget.Second));
                         }
                         activeTms.ElementAt(temp).running = true;
                         tmrOneSec.Enabled = true;
