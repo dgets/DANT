@@ -31,9 +31,9 @@ namespace DamosAlarmsNTimers {
                 ndx = pf.chklstAlarms.CheckedIndices[0];
 
                 txtEditAlarmName.Text = pf.activeAls[ndx].name;
-                nudEditHour.Value = pf.activeAls[ndx].target.Hour;
-                nudEditMinute.Value = pf.activeAls[ndx].target.Minute;
-                nudEditSecond.Value = pf.activeAls[ndx].target.Second;
+                nudEditHour.Value = pf.activeAls[ndx].ringAt.Hour;
+                nudEditMinute.Value = pf.activeAls[ndx].ringAt.Minute;
+                nudEditSecond.Value = pf.activeAls[ndx].ringAt.Second;
                 txtShowSoundByte.Text = pf.activeAls[ndx].soundBite;
             } else {
                 alOrTm = false;
@@ -41,9 +41,9 @@ namespace DamosAlarmsNTimers {
                 ndx = pf.chklstTimers.CheckedIndices[0];
 
                 txtEditAlarmName.Text = pf.activeTms[ndx].name;
-                nudEditHour.Value = pf.activeTms[ndx].target.Hour;
-                nudEditMinute.Value = pf.activeTms[ndx].target.Minute;
-                nudEditSecond.Value = pf.activeTms[ndx].target.Second;
+                nudEditHour.Value = pf.activeTms[ndx].tmpTarget.Hour;
+                nudEditMinute.Value = pf.activeTms[ndx].tmpTarget.Minute;
+                nudEditSecond.Value = pf.activeTms[ndx].tmpTarget.Second;
                 txtShowSoundByte.Text = pf.activeTms[ndx].soundBite;
             }
         }
