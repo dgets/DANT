@@ -453,9 +453,12 @@ namespace DamosAlarmsNTimers
          * be reworked significantly; probably resulting in a new
          * temporary class or passing back things in an array.  
          * Leaving off here on the 'doze machine for today
-        
+         *
+         * This is no longer needed; leaving it in until I'm sure that
+         * removing the code won't take away something I still need
+         * to draw from, though
          */
-        private AlarmsTimers createTmpEntry(string[] fields) {
+        /* private AlarmsTimers createTmpEntry(string[] fields) {
             if (fields[0] == null) { return null; }
 
             AlarmsTimers tmp = new AlarmsTimers();
@@ -471,7 +474,7 @@ namespace DamosAlarmsNTimers
             }
 
             return tmp;
-        }
+        } */
 
         private Alarms createTmpAlarm(string[] fields) {
             if (fields[0] == null) { return null; }
