@@ -399,12 +399,14 @@ namespace DamosAlarmsNTimers
                 Timers tmpTimer = new Timers();
 
                 rawFields = parseSavedFieldsLine(raw);
-                if ((createTmpEntry(rawFields) == null)) { 
+                if (rawFields[0] == null) { 
                     break; 
                 } else if (rawFields[0].CompareTo("A") == 0) {
+                    tmpAlarm = createTmpAlarm(rawFields);
                     activeAls.Add(tmpAlarm);
                     addAlarm(aCntr++);
                 } else if (rawFields[0].CompareTo("T") == 0) {
+                    tmpTimer = createTmpTimer(rawFields);
                     activeTms.Add(tmpTimer);
                     addTimer(tCntr++);
                 } else {
@@ -445,37 +447,6 @@ namespace DamosAlarmsNTimers
             } else { return false; }
         }
 
-        /*
-         * Method parses split field data from the config file into a
-         * temporary AlarmsTimers object and returns that value
-         * 
-         * Due to splitting up the classes, this is going to have to
-         * be reworked significantly; probably resulting in a new
-         * temporary class or passing back things in an array.  
-         * Leaving off here on the 'doze machine for today
-         *
-         * This is no longer needed; leaving it in until I'm sure that
-         * removing the code won't take away something I still need
-         * to draw from, though
-         */
-        /* private AlarmsTimers createTmpEntry(string[] fields) {
-            if (fields[0] == null) { return null; }
-
-            AlarmsTimers tmp = new AlarmsTimers();
-
-            tmp.name = fields[1];
-            tmp.running = false;
-            tmp.target = checkAlarmDay(convertSavedFields(fields));
-            tmp.soundBite = fields[5];
-            if (fields[0].CompareTo("A") == 0) {
-                tmp.alarm = true;
-            } else {
-                tmp.alarm = false;
-            }
-
-            return tmp;
-        } */
-
         private Alarms createTmpAlarm(string[] fields) {
             if (fields[0] == null) { return null; }
             if (fields[0].CompareTo("A") != 0) { return null; }
@@ -514,7 +485,7 @@ namespace DamosAlarmsNTimers
         private void addAlarm(int alarmNo) {
             chklstAlarms.Items.Insert(alarmNo,
                 (activeAls.ElementAt(alarmNo).name + " -> " +
-                 addZeroesToTime(activeAls.ElementAt(alarmNo).target)));
+                 addZeroesToTime(activeAls.ElementAt(alarmNo).ringAt)));
         }
 
         /*
@@ -523,7 +494,7 @@ namespace DamosAlarmsNTimers
         private void addTimer(int timerNo) {
             chklstTimers.Items.Insert(timerNo,
                 (activeTms.ElementAt(timerNo).name + " -> " +
-                 addZeroesToTime(activeTms.ElementAt(timerNo).target)));
+                 addZeroesToTime(activeTms.ElementAt(timerNo).tmpTarget)));
         }
 
         //private void chklstAlarms_CheckedChanged(object sender, ItemCheckEventArgs e) {
@@ -546,14 +517,14 @@ namespace DamosAlarmsNTimers
                 chklstAlarms.Items.RemoveAt(ndx);
                 chklstAlarms.Items.Insert(ndx,
                     (activeAls.ElementAt(ndx).name + " -> " +
-                     addZeroesToTime(activeAls.ElementAt(ndx).target)));
+                     addZeroesToTime(activeAls.ElementAt(ndx).ringAt)));
             } else {
                 activeTms.ElementAt(ndx).running = false;
                 //checklist, etc etc etc
                 chklstTimers.Items.RemoveAt(ndx);
                 chklstTimers.Items.Insert(ndx,
                     (activeTms.ElementAt(ndx).name + " -> " +
-                     addZeroesToTime(activeTms.ElementAt(ndx).target)));
+                     addZeroesToTime(activeTms.ElementAt(ndx).tmpTarget)));
             }
         }
 
@@ -676,7 +647,7 @@ namespace DamosAlarmsNTimers
                             (int)activeAls.ElementAt(ndx).ringAt.Minute,
                             (int)activeAls.ElementAt(ndx).ringAt.Second);
                 }
-                activeAls.ElementAt(ndx).autoSetInterval();
+                activeAls.ElementAt(ndx).setInterval();
             } else {
                 if (activeTms.ElementAt(ndx).running == false) {
                     activeTms.ElementAt(ndx).running = true;
@@ -691,7 +662,7 @@ namespace DamosAlarmsNTimers
                             activeTms.ElementAt(ndx).tmpTarget.ToString());
                     }
                 }
-                activeTms.ElementAt(ndx).autoSetInterval();
+                activeTms.ElementAt(ndx).setInterval();
             }
         }
 
@@ -913,7 +884,7 @@ namespace DamosAlarmsNTimers
                     DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
                 activeAls[ndx].soundBite = fn;
                 activeAls[ndx].running = false;
-                activeAls[ndx].autoSetInterval();
+                activeAls[ndx].setInterval();
 
                 chklstAlarms.SetItemChecked(ndx, false);
             } else {
@@ -922,7 +893,7 @@ namespace DamosAlarmsNTimers
                     DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
                 activeTms[ndx].soundBite = fn;
                 activeTms[ndx].running = false;
-                activeTms[ndx].autoSetInterval();
+                activeTms[ndx].setInterval();
 
                 chklstTimers.SetItemChecked(ndx, false);
             }
