@@ -670,11 +670,11 @@ namespace DamosAlarmsNTimers
             if (alarm) {
                 if (activeAls.ElementAt(ndx).running == false) {
                     activeAls.ElementAt(ndx).running = true;
-                    activeAls.ElementAt(ndx).target =
+                    activeAls.ElementAt(ndx).ringAt =
                         checkAlarmDay(
-                            (int)activeAls.ElementAt(ndx).target.Hour,
-                            (int)activeAls.ElementAt(ndx).target.Minute,
-                            (int)activeAls.ElementAt(ndx).target.Second);
+                            (int)activeAls.ElementAt(ndx).ringAt.Hour,
+                            (int)activeAls.ElementAt(ndx).ringAt.Minute,
+                            (int)activeAls.ElementAt(ndx).ringAt.Second);
                 }
                 activeAls.ElementAt(ndx).autoSetInterval();
             } else {
@@ -682,9 +682,9 @@ namespace DamosAlarmsNTimers
                     activeTms.ElementAt(ndx).running = true;
                     activeTms.ElementAt(ndx).tmpTarget =
                         DateTime.Now.AddSeconds(
-                            (activeTms.ElementAt(ndx).target.Hour * 3600) +
-                            (activeTms.ElementAt(ndx).target.Minute * 60) +
-                            (activeTms.ElementAt(ndx).target.Second));
+                            (activeTms.ElementAt(ndx).tmpTarget.Hour * 3600) +
+                            (activeTms.ElementAt(ndx).tmpTarget.Minute * 60) +
+                            (activeTms.ElementAt(ndx).tmpTarget.Second));
                     if (debugging) {
                         Console.WriteLine("tmpTarget for Timer #" +
                             ndx.ToString() + " set to " +
@@ -809,10 +809,10 @@ namespace DamosAlarmsNTimers
                     }
 
                     //handle checking the date due to our shitty handling
-                    activeAls.ElementAt(temp).target =
-                        checkAlarmDay(activeAls.ElementAt(temp).target.Hour,
-                            activeAls.ElementAt(temp).target.Minute,
-                            activeAls.ElementAt(temp).target.Second);
+                    activeAls.ElementAt(temp).ringAt =
+                        checkAlarmDay(activeAls.ElementAt(temp).ringAt.Hour,
+                            activeAls.ElementAt(temp).ringAt.Minute,
+                            activeAls.ElementAt(temp).ringAt.Second);
 
                     //enable timer if it hasn't been handled already
                     if (tmrOneSec.Enabled == false) {
@@ -909,7 +909,7 @@ namespace DamosAlarmsNTimers
             int hr, int min, int sec, String fn) {
             if (alarm) {
                 activeAls[ndx].name = an;
-                activeAls[ndx].target = new DateTime(DateTime.Now.Year,
+                activeAls[ndx].ringAt = new DateTime(DateTime.Now.Year,
                     DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
                 activeAls[ndx].soundBite = fn;
                 activeAls[ndx].running = false;
@@ -918,7 +918,7 @@ namespace DamosAlarmsNTimers
                 chklstAlarms.SetItemChecked(ndx, false);
             } else {
                 activeTms[ndx].name = an;
-                activeTms[ndx].target = new DateTime(DateTime.Now.Year,
+                activeTms[ndx].tmpTarget = new DateTime(DateTime.Now.Year,
                     DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
                 activeTms[ndx].soundBite = fn;
                 activeTms[ndx].running = false;
@@ -977,10 +977,10 @@ namespace DamosAlarmsNTimers
                 return;
             }
 
-            AlarmsTimers tmpTimer = new AlarmsTimers();
+            Timers tmpTimer = new Timers();
 
             tmpTimer.name = txtTimerName.Text;
-            tmpTimer.target = new DateTime(DateTime.Now.Year,
+            tmpTimer.tmpTarget = new DateTime(DateTime.Now.Year,
                 DateTime.Now.Month, DateTime.Now.Day, (int)numTimerHr.Value,
                 (int)numTimerMin.Value, (int)numTimerSec.Value);
             tmpTimer.running = false;
