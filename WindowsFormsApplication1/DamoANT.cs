@@ -1106,5 +1106,13 @@ namespace DamosAlarmsNTimers
                 saveAlarmsTimers();
             }
         }
+
+        /*
+         * Method is used to bring up a help window
+         */
+        private void btnHelp(object sender, EventArgs e) {
+            
+
+        }
     }
 }

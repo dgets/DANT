@@ -56,6 +56,7 @@
             this.lblTimers = new System.Windows.Forms.Label();
             this.tmrOneSec = new System.Windows.Forms.Timer(this.components);
             this.openSoundFile = new System.Windows.Forms.OpenFileDialog();
+            this.btnHelp = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -76,6 +77,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnHelp);
             this.splitContainer1.Panel1.Controls.Add(this.btnEditAlarm);
             this.splitContainer1.Panel1.Controls.Add(this.lblWipeAlarm);
             this.splitContainer1.Panel1.Controls.Add(this.btnToastAlarm);
@@ -227,10 +229,10 @@
             // lblAlarms
             // 
             this.lblAlarms.AutoSize = true;
-            this.lblAlarms.Font = new System.Drawing.Font("Viner Hand ITC", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblAlarms.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblAlarms.Location = new System.Drawing.Point(12, 9);
             this.lblAlarms.Name = "lblAlarms";
-            this.lblAlarms.Size = new System.Drawing.Size(113, 44);
+            this.lblAlarms.Size = new System.Drawing.Size(98, 31);
             this.lblAlarms.TabIndex = 0;
             this.lblAlarms.Text = "Alarms";
             // 
@@ -354,10 +356,10 @@
             // lblTimers
             // 
             this.lblTimers.AutoSize = true;
-            this.lblTimers.Font = new System.Drawing.Font("Viner Hand ITC", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTimers.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTimers.Location = new System.Drawing.Point(3, 9);
             this.lblTimers.Name = "lblTimers";
-            this.lblTimers.Size = new System.Drawing.Size(102, 44);
+            this.lblTimers.Size = new System.Drawing.Size(97, 31);
             this.lblTimers.TabIndex = 0;
             this.lblTimers.Text = "Timers";
             // 
@@ -371,6 +373,15 @@
             this.openSoundFile.DefaultExt = "mp3";
             this.openSoundFile.FileName = "openFileDialog1";
             this.openSoundFile.Title = "Alarm/Timer Notification Sound";
+            // 
+            // btnHelp
+            // 
+            this.btnHelp.Location = new System.Drawing.Point(184, 397);
+            this.btnHelp.Name = "btnHelp";
+            this.btnHelp.Size = new System.Drawing.Size(75, 23);
+            this.btnHelp.TabIndex = 1;
+            this.btnHelp.Text = "Help";
+            this.btnHelp.UseVisualStyleBackColor = true;
             // 
             // frmDamoANTs
             // 
@@ -425,6 +436,7 @@
         internal System.Windows.Forms.TextBox txtAlarmName;
         private System.Windows.Forms.Button btnEditTimer;
         public System.Windows.Forms.CheckedListBox chklstTimers;
+        private System.Windows.Forms.Button btnHelp;
     }
 }
 
