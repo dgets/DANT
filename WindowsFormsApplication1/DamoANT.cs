@@ -44,7 +44,8 @@ namespace DamosAlarmsNTimers
         private const Boolean debugging = true;
         private String cfgFile;
         public frmEditWindow editWindow = null;
-        
+        public frmHelp helpWindow = null;
+
         /*
          * Constructor for the frmDamoANTs form
          */
@@ -1071,6 +1072,15 @@ namespace DamosAlarmsNTimers
                     }
                 }
             }
+        }
+
+        /*
+         * Method is used to display general help for the application, nothing more
+         * at this point, though this will probably be expounded upon in the future
+         */
+        private void btnGetHelp_Click(object sender, EventArgs e) {
+            helpWindow = new frmHelp();
+            helpWindow.Show();
         }
 
         /*

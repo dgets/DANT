@@ -56,7 +56,7 @@
             this.lblTimers = new System.Windows.Forms.Label();
             this.tmrOneSec = new System.Windows.Forms.Timer(this.components);
             this.openSoundFile = new System.Windows.Forms.OpenFileDialog();
-            this.btnHelp = new System.Windows.Forms.Button();
+            this.btnGetHelp = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -77,7 +77,7 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.btnHelp);
+            this.splitContainer1.Panel1.Controls.Add(this.btnGetHelp);
             this.splitContainer1.Panel1.Controls.Add(this.btnEditAlarm);
             this.splitContainer1.Panel1.Controls.Add(this.lblWipeAlarm);
             this.splitContainer1.Panel1.Controls.Add(this.btnToastAlarm);
@@ -374,14 +374,14 @@
             this.openSoundFile.FileName = "openFileDialog1";
             this.openSoundFile.Title = "Alarm/Timer Notification Sound";
             // 
-            // btnHelp
+            // btnGetHelp
             // 
-            this.btnHelp.Location = new System.Drawing.Point(184, 397);
-            this.btnHelp.Name = "btnHelp";
-            this.btnHelp.Size = new System.Drawing.Size(75, 23);
-            this.btnHelp.TabIndex = 1;
-            this.btnHelp.Text = "Help";
-            this.btnHelp.UseVisualStyleBackColor = true;
+            this.btnGetHelp.Location = new System.Drawing.Point(172, 27);
+            this.btnGetHelp.Name = "btnGetHelp";
+            this.btnGetHelp.Size = new System.Drawing.Size(87, 23);
+            this.btnGetHelp.TabIndex = 1;
+            this.btnGetHelp.Text = "General Help";
+            this.btnGetHelp.UseVisualStyleBackColor = true;
             // 
             // frmDamoANTs
             // 
@@ -436,7 +436,7 @@
         internal System.Windows.Forms.TextBox txtAlarmName;
         private System.Windows.Forms.Button btnEditTimer;
         public System.Windows.Forms.CheckedListBox chklstTimers;
-        private System.Windows.Forms.Button btnHelp;
+        private System.Windows.Forms.Button btnGetHelp;
     }
 }
 
