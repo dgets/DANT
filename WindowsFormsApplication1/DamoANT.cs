@@ -41,7 +41,14 @@ namespace DamosAlarmsNTimers
     {
         public List<Alarms> activeAls = new List<Alarms>();
         public List<Timers> activeTms = new List<Timers>();
-        private const Boolean debugging = true;
+
+        /* debugging flags */
+        private const Boolean generalDebugging = true; //misc
+        private const Boolean alarmDebugging = false;
+        private const Boolean timerDebugging = true;
+        private const Boolean tickDebugging = true;
+        private const Boolean fileIODebugging = false;
+
         private String cfgFile;
         public frmEditWindow editWindow = null;
         public frmHelp helpWindow = null;
@@ -79,7 +86,7 @@ namespace DamosAlarmsNTimers
             }
 
             public Boolean checkIfFiring() {
-                if (debugging) {
+                if (alarmDebugging) {
                     Console.WriteLine("Checking if firing\nRunning value for: " +
                         name + " is: " + running.ToString() + "\nSeconds " +
                         "left: " + interval.TotalSeconds.ToString() + "\n" +
@@ -136,7 +143,7 @@ namespace DamosAlarmsNTimers
             }
 
             public Boolean checkIfFiring() {
-                if (debugging) {
+                if (timerDebugging) {
                     Console.WriteLine("Checking if firing\nRunning value for: " +
                         name + " is: " + running.ToString() + "\nSeconds " +
                         "left: " + interval.TotalSeconds.ToString() + "\n" +
@@ -279,12 +286,12 @@ namespace DamosAlarmsNTimers
             System.IO.StreamWriter cFile = 
                 new System.IO.StreamWriter(cfgFile);
 
-            if (debugging) {
+            if (fileIODebugging) {
                 Console.WriteLine("Opened " + cfgFile + " for writing");
             }
 
             for (cntr = 0; cntr < activeAls.Count(); cntr++) {
-                if (debugging) {
+                if (fileIODebugging) {
                     Console.WriteLine("Adding activeAls[" + cntr.ToString() +
                         "] to save file . . .");
                 } try {
@@ -295,7 +302,7 @@ namespace DamosAlarmsNTimers
                 }
             }
             for (cntr = 0; cntr < activeTms.Count(); cntr++) {
-                if (debugging) {
+                if (fileIODebugging) {
                     Console.WriteLine("Adding activeTms[" + cntr.ToString() +
                         "] to save file . . .");
                 } try {
@@ -440,7 +447,7 @@ namespace DamosAlarmsNTimers
          */
         private Boolean chkCfg() {
             if (!File.Exists(cfgFile)) {
-                if (debugging) {
+                if (generalDebugging) {
                     Console.WriteLine("Empty or nonexistant config file " +
                         "detected");
                 }
@@ -565,7 +572,7 @@ namespace DamosAlarmsNTimers
         private void tickDoAlarms() {
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
                 if (!chklstAlarms.GetItemChecked(cntr)) {
-                    if (debugging) {
+                    if (tickDebugging) {
                         Console.WriteLine("Non-Active Alarm #" +
                             cntr.ToString() + " being unset");
                     }
@@ -578,7 +585,7 @@ namespace DamosAlarmsNTimers
                     updateDisplay(cntr, true);
 
                     if (activeAls.ElementAt(cntr).checkIfFiring()) {
-                        if (debugging) {
+                        if (tickDebugging) {
                             Console.WriteLine("Found activeAls[" +
                                 cntr.ToString() + "] to be firing");
                         }
@@ -601,7 +608,7 @@ namespace DamosAlarmsNTimers
         private void tickDoTimers() {
             for (int cntr = 0; cntr < activeTms.Count; cntr++) {
                 if (!chklstTimers.GetItemChecked(cntr)) {
-                    if (debugging) {
+                    if (tickDebugging) {
                         Console.WriteLine("Non-Active Timer #" +
                             cntr.ToString() + " being unset");
                     }
@@ -614,7 +621,7 @@ namespace DamosAlarmsNTimers
                     updateDisplay(cntr, false);
 
                     if (activeTms.ElementAt(cntr).checkIfFiring()) {
-                        if (debugging) {
+                        if (tickDebugging) {
                             Console.WriteLine("Found activeAls[" +
                                 cntr.ToString() + "] to be firing");
                         }
@@ -657,7 +664,8 @@ namespace DamosAlarmsNTimers
                             (activeTms.ElementAt(ndx).tmpTarget.Hour * 3600) +
                             (activeTms.ElementAt(ndx).tmpTarget.Minute * 60) +
                             (activeTms.ElementAt(ndx).tmpTarget.Second));
-                    if (debugging) {
+                    //why does this only have debugging output for timer?
+                    if (tickDebugging || timerDebugging) {
                         Console.WriteLine("tmpTarget for Timer #" +
                             ndx.ToString() + " set to " +
                             activeTms.ElementAt(ndx).tmpTarget.ToString());
@@ -761,7 +769,7 @@ namespace DamosAlarmsNTimers
          * is needed
          */
         private void checkActiveAlarms() {
-            if (debugging) {
+            if (alarmDebugging) {
                 Console.WriteLine("Firing chklstAlarms_Clicked");
             }
 
@@ -776,7 +784,7 @@ namespace DamosAlarmsNTimers
                 //these are specifically checked, so double checking that in the
                 //conditional should not be necessary
                 if (activeAls.ElementAt(temp).running != true) {
-                    if (debugging) {
+                    if (alarmDebugging) {
                         Console.WriteLine("Flagged alarm #" + temp.ToString());
                     }
 
@@ -859,6 +867,8 @@ namespace DamosAlarmsNTimers
          */
         private void btnEditAlarm_Click(object sender, EventArgs e) {
             if (chklstAlarms.CheckedIndices.Count == 0) {
+                //this should be changed as having something be running in
+                //order to edit it is just drop dead stoopid
                 MessageBox.Show("You must check an alarm before trying to " +
                     "edit it!");
             } else {
@@ -1034,7 +1044,7 @@ namespace DamosAlarmsNTimers
          * the specific timer List object if it has been enabled by the user
          */
         private void checkActiveTimers() {
-            if (debugging) {
+            if (timerDebugging) {
                 Console.WriteLine("Firing chklstTimers_Clicked");
             }
 
@@ -1049,7 +1059,7 @@ namespace DamosAlarmsNTimers
                 //these are specifically checked, so double checking that in the
                 //conditional should not be necessary
                 if (activeTms.ElementAt(temp).running != true) {
-                    if (debugging) {
+                    if (timerDebugging) {
                         Console.WriteLine("Flagged timer #" + temp.ToString());
                     }
 
@@ -1079,6 +1089,10 @@ namespace DamosAlarmsNTimers
          * at this point, though this will probably be expounded upon in the future
          */
         private void btnGetHelp_Click(object sender, EventArgs e) {
+            if (generalDebugging) {
+                Console.WriteLine("Click to enter help window picked up");
+            }
+
             helpWindow = new frmHelp();
             helpWindow.Show();
         }
@@ -1120,9 +1134,12 @@ namespace DamosAlarmsNTimers
         /*
          * Method is used to bring up a help window
          */
+        /*
+         * pretty sure this isn't the right one
         private void btnHelp(object sender, EventArgs e) {
-            
-
+            helpWindow = new frmHelp();
+            helpWindow.Show();
         }
+         */
     }
 }
