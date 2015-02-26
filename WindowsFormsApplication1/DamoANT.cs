@@ -36,20 +36,21 @@ using System.Media;
  */
 
 namespace DamosAlarmsNTimers
-{
+{ 
     public partial class frmDamoANTs : Form
     {
         public List<Alarms> activeAls = new List<Alarms>();
         public List<Timers> activeTms = new List<Timers>();
 
         /* debugging flags */
-        private const Boolean generalDebugging = true; //misc
-        private const Boolean alarmDebugging = false;
-        private const Boolean timerDebugging = true;
-        private const Boolean tickDebugging = true;
-        private const Boolean fileIODebugging = false;
+        public const Boolean generalDebugging = true; //misc
+        public const Boolean alarmDebugging = false;
+        public const Boolean timerDebugging = true;
+        public const Boolean tickDebugging = true;
+        public const Boolean fileIODebugging = false;
 
         private String cfgFile;
+
         public frmEditWindow editWindow = null;
         public frmHelp helpWindow = null;
 
@@ -150,6 +151,7 @@ namespace DamosAlarmsNTimers
                         "Target time: " + tmpTarget.ToShortTimeString());
                 }
 
+                //why is this duplicated from not far above?  Modularize.
                 if ((interval.TotalSeconds < 1) &&
                     (interval.TotalSeconds > -1)) {
                     running = false;
@@ -251,7 +253,13 @@ namespace DamosAlarmsNTimers
 
             //add alarm to the 'active' alarms list in the checkboxlist
             addAlarm(activeAls.IndexOf(tmpAlarm));
-            saveAlarmsTimers();
+            try {
+                saveAlarmsTimers();
+            } catch {
+                if (fileIODebugging) {
+                    Console.WriteLine("Error saving alarms/timers\n");
+                }
+            }
         }
 
         /*
@@ -294,21 +302,29 @@ namespace DamosAlarmsNTimers
                 if (fileIODebugging) {
                     Console.WriteLine("Adding activeAls[" + cntr.ToString() +
                         "] to save file . . .");
-                } try {
+                } 
+                
+                try {
                     cFile.WriteLine(createCfgCSVString(true, cntr));
                 } catch {
                     MessageBox.Show("Error adding activeAls[" +
                         cntr.ToString() + "]!");
+                    throw new DANTException("Error adding activeAls[" +
+                                cntr.ToString() + "]!");
                 }
             }
             for (cntr = 0; cntr < activeTms.Count(); cntr++) {
                 if (fileIODebugging) {
                     Console.WriteLine("Adding activeTms[" + cntr.ToString() +
                         "] to save file . . .");
-                } try {
+                } 
+                
+                try {
                     cFile.WriteLine(createCfgCSVString(false, cntr));
                 } catch {
                     MessageBox.Show("Error adding activeTms[" +
+                        cntr.ToString() + "]!");
+                    throw new DANTException("Error adding activeTms[" +
                         cntr.ToString() + "]!");
                 }
             }
@@ -347,7 +363,8 @@ namespace DamosAlarmsNTimers
             if (rawFields.Count() != 6) {
                 MessageBox.Show("Error parsing " + cfgFile +
                     "; please check the config file and try again!");
-                rawFields[0] = null;    //poor way to indicate error condition
+                throw new DANTException("Error parsing config file");
+                //rawFields[0] = null;    //poor way to indicate error condition
             }
 
             return rawFields;
@@ -406,7 +423,15 @@ namespace DamosAlarmsNTimers
                 Alarms tmpAlarm = new Alarms();
                 Timers tmpTimer = new Timers();
 
-                rawFields = parseSavedFieldsLine(raw);
+                try {
+                    rawFields = parseSavedFieldsLine(raw);
+                } catch {
+                    if (fileIODebugging) {
+                        Console.WriteLine("Error parsing saved fields line\n");
+                    }
+                    rawFields[0] = null;    //not sure what the fuh is going on
+                }
+
                 if (rawFields[0] == null) { 
                     break; 
                 } else if (rawFields[0].CompareTo("A") == 0) {
@@ -856,7 +881,13 @@ namespace DamosAlarmsNTimers
                 //necessary (if this was the only active alarm/timer)
                 chklstAlarms.Items.RemoveAt(ndx);
                 activeAls.RemoveAt(ndx);
-                saveAlarmsTimers();
+                try {
+                    saveAlarmsTimers();
+                } catch {
+                    if (generalDebugging) {
+                        Console.WriteLine("Error toasting alarm.");
+                    }
+                }   //there really should be more error handling here
             }
         }
 
@@ -909,8 +940,13 @@ namespace DamosAlarmsNTimers
                 chklstTimers.SetItemChecked(ndx, false);
             }
 
-            if (!saveAlarmsTimers()) {
+            try {
+                saveAlarmsTimers();
+            } catch {
                 MessageBox.Show("Had an issue trying to save configuration");
+                if (fileIODebugging) {
+                    Console.WriteLine("Issue saving alarms/timers config\n");
+                }
             }
         }
 
@@ -975,7 +1011,13 @@ namespace DamosAlarmsNTimers
 
             //add timer to the 'active' timers list in the checkboxlist
             addTimer(activeTms.IndexOf(tmpTimer));
-            saveAlarmsTimers();
+            try {
+                saveAlarmsTimers();
+            } catch {
+                if (fileIODebugging) {
+                    Console.WriteLine("Error saving alarms/timers\n");
+                }
+            }
         }
 
         /*
@@ -1127,7 +1169,13 @@ namespace DamosAlarmsNTimers
                 //need to add code in here to stop timer from ticking if nec.
                 chklstTimers.Items.RemoveAt(ndx);
                 activeTms.RemoveAt(ndx);
-                saveAlarmsTimers();
+                try {
+                    saveAlarmsTimers();
+                } catch {
+                    if (fileIODebugging) {
+                        Console.WriteLine("Error saving alarms/timers\n");
+                    }
+                }
             }
         }
 
@@ -1141,5 +1189,10 @@ namespace DamosAlarmsNTimers
             helpWindow.Show();
         }
          */
+    }
+    
+    public class DANTException : ApplicationException {
+        public DANTException(String s) : base (s) {
+        }
     }
 }
