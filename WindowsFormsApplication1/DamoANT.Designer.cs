@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnGetHelp = new System.Windows.Forms.Button();
             this.btnEditAlarm = new System.Windows.Forms.Button();
             this.lblWipeAlarm = new System.Windows.Forms.Label();
             this.btnToastAlarm = new System.Windows.Forms.Button();
@@ -56,7 +57,6 @@
             this.lblTimers = new System.Windows.Forms.Label();
             this.tmrOneSec = new System.Windows.Forms.Timer(this.components);
             this.openSoundFile = new System.Windows.Forms.OpenFileDialog();
-            this.btnGetHelp = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -108,6 +108,15 @@
             this.splitContainer1.Size = new System.Drawing.Size(515, 432);
             this.splitContainer1.SplitterDistance = 262;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // btnGetHelp
+            // 
+            this.btnGetHelp.Location = new System.Drawing.Point(172, 27);
+            this.btnGetHelp.Name = "btnGetHelp";
+            this.btnGetHelp.Size = new System.Drawing.Size(87, 23);
+            this.btnGetHelp.TabIndex = 1;
+            this.btnGetHelp.Text = "General Help";
+            this.btnGetHelp.UseVisualStyleBackColor = true;
             // 
             // btnEditAlarm
             // 
@@ -173,9 +182,9 @@
             this.lblAlarmAddTime.AutoSize = true;
             this.lblAlarmAddTime.Location = new System.Drawing.Point(137, 278);
             this.lblAlarmAddTime.Name = "lblAlarmAddTime";
-            this.lblAlarmAddTime.Size = new System.Drawing.Size(59, 13);
+            this.lblAlarmAddTime.Size = new System.Drawing.Size(127, 13);
             this.lblAlarmAddTime.TabIndex = 4;
-            this.lblAlarmAddTime.Text = "Alarm Time";
+            this.lblAlarmAddTime.Text = "24 Hr Alarm Time (H M S)";
             // 
             // numAlarmSec
             // 
@@ -300,9 +309,9 @@
             this.lblTimerAddTime.AutoSize = true;
             this.lblTimerAddTime.Location = new System.Drawing.Point(136, 278);
             this.lblTimerAddTime.Name = "lblTimerAddTime";
-            this.lblTimerAddTime.Size = new System.Drawing.Size(71, 13);
+            this.lblTimerAddTime.Size = new System.Drawing.Size(110, 13);
             this.lblTimerAddTime.TabIndex = 9;
-            this.lblTimerAddTime.Text = "Timer Interval";
+            this.lblTimerAddTime.Text = "Timer Interval (H M S)";
             // 
             // numTimerSec
             // 
@@ -373,15 +382,6 @@
             this.openSoundFile.DefaultExt = "mp3";
             this.openSoundFile.FileName = "openFileDialog1";
             this.openSoundFile.Title = "Alarm/Timer Notification Sound";
-            // 
-            // btnGetHelp
-            // 
-            this.btnGetHelp.Location = new System.Drawing.Point(172, 27);
-            this.btnGetHelp.Name = "btnGetHelp";
-            this.btnGetHelp.Size = new System.Drawing.Size(87, 23);
-            this.btnGetHelp.TabIndex = 1;
-            this.btnGetHelp.Text = "General Help";
-            this.btnGetHelp.UseVisualStyleBackColor = true;
             // 
             // frmDamoANTs
             // 
