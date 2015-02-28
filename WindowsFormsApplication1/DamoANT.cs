@@ -555,7 +555,7 @@ namespace DamosAlarmsNTimers
         private void addTimer(int timerNo) {
             chklstTimers.Items.Insert(timerNo,
                 (activeTms.ElementAt(timerNo).name + " -> " +
-                 addZeroesToTime(activeTms.ElementAt(timerNo).tmpTarget)));
+                 activeTms.ElementAt(timerNo).getInterval().ToString()));
         }
 
         //private void chklstAlarms_CheckedChanged(object sender, 
@@ -1024,7 +1024,7 @@ namespace DamosAlarmsNTimers
             }
             if (!legitTime((int)numTimerHr.Value, (int)numTimerMin.Value,
                                 (int)numTimerSec.Value, false)) {
-                throw new DANTException("Not legit time fm. legitTim()\n");
+                throw new DANTException("Not legit time fm. legitTime()\n");
             }
 
             Timers tmpTimer = new Timers();
