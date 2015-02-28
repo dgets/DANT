@@ -429,10 +429,10 @@ namespace DamosAlarmsNTimers
                     if (fileIODebugging) {
                         Console.WriteLine("Error parsing saved fields line\n");
                     }
-                    rawFields[0] = null;    //not sure what the fuh is going on
+                    rawFields = null;    //not sure what the fuh is going on
                 }
 
-                if (rawFields[0] == null) { 
+                if (rawFields == null) { 
                     break; 
                 } else if (rawFields[0].CompareTo("A") == 0) {
                     tmpAlarm = createTmpAlarm(rawFields);
@@ -1135,7 +1135,7 @@ namespace DamosAlarmsNTimers
                 Console.WriteLine("Click to enter help window picked up");
             }
 
-            helpWindow = new frmHelp();
+            helpWindow = new frmHelp(this);
             helpWindow.Show();
         }
 

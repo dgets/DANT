@@ -121,6 +121,8 @@
     <value>Welcome to Damo's Alarms 'N Timers.  Please be aware that
 this is a work in progress, and the UI is still a little rough.
 
+Be aware that, at this juncture, all of the times in Alarms should be entered in military format, at least until I fix this better to add AM/PM support.
+
 Alarm &amp; Timer Selection for Editing
  * Alarms or Timers should be hilighted by clicking on the text of the alarm name before clicking the 'Edit' button
  * Multiple Alarms or Timers should not be hilighted when attempting to do this
