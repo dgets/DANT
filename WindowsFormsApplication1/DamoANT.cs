@@ -645,11 +645,11 @@ namespace DamosAlarmsNTimers
                             Console.WriteLine("Found activeAls[" +
                                 cntr.ToString() + "] to be firing");
                         }
-                        ringRingNeo(true, cntr);
                         if (anyRunning(false, true)) {
                             tmrOneSec.Enabled = false;
                             tmrOneSec.Stop();
                         }
+                        ringRingNeo(true, cntr);
                         playAudibleAlarm(false,
                             activeAls.ElementAt(cntr).soundBite, cntr);
                     }
@@ -688,6 +688,11 @@ namespace DamosAlarmsNTimers
                         }
                         playAudibleAlarm(false,
                             activeTms.ElementAt(cntr).soundBite, cntr);
+                    } else {
+                        var ouah = activeTms.ElementAt(cntr).getInterval();
+                        ouah -= new TimeSpan(0, 0, 1);
+                        activeTms.ElementAt(cntr).setInterval(ouah.Hours,
+                            ouah.Minutes, ouah.Seconds);
                     }
                 }
             }
