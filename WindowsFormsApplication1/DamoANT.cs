@@ -154,15 +154,6 @@ namespace DamosAlarmsNTimers
                 return interval;
             }
 
-            /*
-             * yes this is very vestigial and needs to be done away with.
-             * good lord the 'ORRAH
-            public void setInterval() {
-                interval = tmpTarget - DateTime.Now;
-            }
-             */
-
-
             public Boolean checkIfFiring() {
                 if (timerDebugging) {
                     Console.WriteLine("Checking if firing\nRunning value for: " +
@@ -248,12 +239,14 @@ namespace DamosAlarmsNTimers
             if (txtAlarmName.Text.CompareTo("Alarm Name Here") == 0) {
                 MessageBox.Show("You must enter a valid name for the " +
                     "alarm that you are setting!");
-                return;
+                throw new DANTException("Enter valid name for the alarm/" +
+                    "timer being set");
             }
             //verify that numericUpDown selectors are not at 0,0,0
             if (!legitTime((int)numAlarmHr.Value, (int)numAlarmMin.Value,
                 (int)numAlarmSec.Value, true)) {
-                return;
+                throw new DANTException("At least one element must be " +
+                    "nonzero");
             }
             
             Alarms tmpAlarm = new Alarms();
@@ -279,6 +272,7 @@ namespace DamosAlarmsNTimers
                 if (fileIODebugging) {
                     Console.WriteLine("Error saving alarms/timers\n");
                 }
+                throw new DANTException("Error saving alarms/timers\n");
             }
         }
 
@@ -387,7 +381,6 @@ namespace DamosAlarmsNTimers
                 MessageBox.Show("Error parsing " + cfgFile +
                     "; please check the config file and try again!");
                 throw new DANTException("Error parsing config file");
-                //rawFields[0] = null;    //poor way to indicate error condition
             }
 
             return rawFields;
@@ -418,6 +411,7 @@ namespace DamosAlarmsNTimers
                     "try to find out what the hell is going on and " +
                     "try again later.");
                 tmpTimes[0] = 0; tmpTimes[1] = 0; tmpTimes[2] = 0;
+                throw new DANTException("Error parsing cfgFIle fields");
             }
             return tmpTimes;
         }
@@ -426,8 +420,8 @@ namespace DamosAlarmsNTimers
          * Method attempts to load the alarms & timers config file, checking
          * for file corruption, incorrect permissions, and for file existance;
          * Method adds any found alarms or timers to the appropriate global
-         * List objects and returns 'true' if no errors are found or 'false'
-         * on finding any garbled data
+         * List objects and returns 'true' if no errors are found or throws
+         * DANTException upon garbled data or no file found
          */
         private Boolean loadAlarmsTimers() {
             String[] rawFile;
@@ -436,6 +430,7 @@ namespace DamosAlarmsNTimers
             if (chkCfg()) { return true; }
             rawFile = readCfg();
             if (rawFile == null) {
+                throw new DANTException("Error reading cfg file");
                 return false;
             }
 
@@ -450,7 +445,10 @@ namespace DamosAlarmsNTimers
                     rawFields = parseSavedFieldsLine(raw);
                 } catch {
                     if (fileIODebugging) {
-                        Console.WriteLine("Error parsing saved fields line\n");
+                        Console.WriteLine("Error parsing saved fields " +
+                            "line\n");
+                        throw new DANTException("Error parsing saved " +
+                            "fields line\n");
                     }
                     rawFields = null;    //not sure what the fuh is going on
                 }
@@ -469,6 +467,8 @@ namespace DamosAlarmsNTimers
                     MessageBox.Show("Issue parsing config file!",
                         "Cannot Parse DANT.cfg", MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
+                    throw new DANTException("Yet another issue trying to " +
+                        "parse the config file!");
                 }
             }
             return true;
@@ -485,7 +485,7 @@ namespace DamosAlarmsNTimers
             } catch {
                 MessageBox.Show("There was an error reading " + cfgFile +
                     ", aborting.");
-                return null;
+                throw new DANTException("Error reading " + cfgFile);
             }
         }
 
@@ -557,15 +557,6 @@ namespace DamosAlarmsNTimers
                 (activeTms.ElementAt(timerNo).name + " -> " +
                  activeTms.ElementAt(timerNo).getInterval().ToString()));
         }
-
-        //private void chklstAlarms_CheckedChanged(object sender, 
-        //                                         ItemCheckEventArgs e) {
-        //    if (debugging) {
-        //        Console.WriteLine("activeAls.Count: " + activeAls.Count.ToString() +
-        //            "e.Index: " + e.Index.ToString() + "e.NewValue.ToString(): " +
-        //            e.NewValue.ToString());
-        //    }
-        //}
 
         /*
          * Method unsets a specified index number from the appropriate List
@@ -748,7 +739,11 @@ namespace DamosAlarmsNTimers
             if (fn == null) {
                 SystemSounds.Beep.Play();
             } else {
-                wp.controls.play();
+                try {
+                    wp.controls.play();
+                } catch {
+                    throw new DANTException("Unable to play audio: " + fn);
+                }
             }
 
             if (alarm) {
@@ -766,7 +761,7 @@ namespace DamosAlarmsNTimers
                 chklstTimers.Items.RemoveAt(ndx);
                 addTimer(ndx);
             }
-            wp.controls.stop();
+            wp.controls.stop(); //this needs to only happen after a keypress
         }
 
         /*
@@ -919,8 +914,9 @@ namespace DamosAlarmsNTimers
                 } catch {
                     if (generalDebugging) {
                         Console.WriteLine("Error toasting alarm.");
+                        throw new DANTException("Error toasting alarm");
                     }
-                }   //there really should be more error handling here
+                }   //there really should be more error handling
             }
         }
 
@@ -1024,18 +1020,12 @@ namespace DamosAlarmsNTimers
             }
             if (!legitTime((int)numTimerHr.Value, (int)numTimerMin.Value,
                                 (int)numTimerSec.Value, false)) {
-                throw new DANTException("Not legit time fm. legitTime()\n");
+                throw new DANTException("Not legit time from legitTime()\n");
             }
 
             Timers tmpTimer = new Timers();
 
             tmpTimer.name = txtTimerName.Text;
-            /* This should be left as 0s, if not permanently and redacted,
-             * at least until the timer is active to show an estimated ring
-             * tmpTimer.tmpTarget = new DateTime(DateTime.Now.Year,
-                DateTime.Now.Month, DateTime.Now.Day, (int)numTimerHr.Value,
-                (int)numTimerMin.Value, (int)numTimerSec.Value);
-             */
             tmpTimer.setInterval((int) numTimerHr.Value, 
                                  (int) numTimerMin.Value,
                                  (int) numTimerSec.Value);
@@ -1055,6 +1045,7 @@ namespace DamosAlarmsNTimers
                 if (fileIODebugging) {
                     Console.WriteLine("Error saving alarms/timers\n");
                 }
+                throw new DANTException("Error saving alarms/timers");
             }
         }
 
@@ -1105,7 +1096,8 @@ namespace DamosAlarmsNTimers
             } else if ((hr == 0) && (min == 0) && (sec == 0) && (!alarm)) {
                 MessageBox.Show("Invalid timer duration!", "Zero Timer",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
+                throw new DANTException("Invalid timer duration");
+                //return false;
             }
             return true;
         }
@@ -1214,20 +1206,16 @@ namespace DamosAlarmsNTimers
                     if (fileIODebugging) {
                         Console.WriteLine("Error saving alarms/timers\n");
                     }
+                    throw new DANTException("Error saving alarms/timers");
                 }
             }
         }
-
-        /*
-         * Method is used to bring up a help window
-         *
-        private void btnHelp(object sender, EventArgs e) {
-            helpWindow = new frmHelp();
-            helpWindow.Show();
-        } */
     }
     
     public class DANTException : ApplicationException {
+        /*
+         * method exists solely for throwing as an exception
+         */
         public DANTException(String s) : base (s) {
         }
     }
