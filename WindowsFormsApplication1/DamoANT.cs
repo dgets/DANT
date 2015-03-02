@@ -723,17 +723,14 @@ namespace DamosAlarmsNTimers
                 //activeTms.ElementAt(ndx).setInterval(); //BUG
             }
         }
-
         /*
-         * Method plays the audible alarm specified in the respective List
-         * object and waits for user interaction to remove the item from
-         * active status, etc
+         * Method simply plays the audio or the beep: trying to modularize code
          */
-        private void playAudibleAlarm(Boolean alarm, string fn, int ndx) {
+        private WMPLib.WindowsMediaPlayer playAudio(string fn) {
             WMPLib.WindowsMediaPlayer wp =
                 new WMPLib.WindowsMediaPlayer();
             wp.URL = fn;
-
+            
             //NOTE: A way to loop this audio until the button is pressed needs
             //to be created
             if (fn == null) {
@@ -746,6 +743,25 @@ namespace DamosAlarmsNTimers
                 }
             }
 
+            return wp;
+        }
+        /*
+         * Method plays the audible alarm specified in the respective List
+         * object and waits for user interaction to remove the item from
+         * active status, etc
+         */
+        private void playAudibleAlarm(Boolean alarm, string fn, int ndx) {
+            WMPLib.WindowsMediaPlayer wp = playAudio(fn);
+            //insert code here to loop this again until there is a button hit
+
+            ringRingNeo(alarm, ndx);
+
+            wp.controls.stop(); //this needs to only happen after a keypress
+        }
+        /*
+         * Method sets respective checklist text to 'ring ring, neo'
+         */
+        private void ringRingNeo(Boolean alarm, int ndx) {
             if (alarm) {
                 MessageBox.Show(activeAls.ElementAt(ndx).name +
                     ": -+=* Ring ring, Neo *=+-",
@@ -753,6 +769,12 @@ namespace DamosAlarmsNTimers
                     MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 chklstAlarms.Items.RemoveAt(ndx);
                 addAlarm(ndx);
+
+                chklstAlarms.SetItemChecked(ndx, false);
+                chklstAlarms.Items.RemoveAt(ndx);
+                chklstAlarms.Items.Insert(ndx,
+                    activeAls.ElementAt(ndx).name + " -+=* RING " +
+                    " RING *=+-");
             } else {
                 MessageBox.Show(activeTms.ElementAt(ndx).name +
                     ": -+=* Ring ring, Neo *=+-",
@@ -760,21 +782,7 @@ namespace DamosAlarmsNTimers
                     MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 chklstTimers.Items.RemoveAt(ndx);
                 addTimer(ndx);
-            }
-            wp.controls.stop(); //this needs to only happen after a keypress
-        }
 
-        /*
-         * Method sets respective checklist text to 'ring ring, neo'
-         */
-        private void ringRingNeo(Boolean alarm, int ndx) {
-            if (alarm) {
-                chklstAlarms.SetItemChecked(ndx, false);
-                chklstAlarms.Items.RemoveAt(ndx);
-                chklstAlarms.Items.Insert(ndx,
-                    activeAls.ElementAt(ndx).name + " -+=* RING " +
-                    " RING *=+-");
-            } else {
                 chklstTimers.SetItemChecked(ndx, false);
                 chklstTimers.Items.RemoveAt(ndx);
                 chklstTimers.Items.Insert(ndx,

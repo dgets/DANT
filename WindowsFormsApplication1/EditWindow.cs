@@ -41,6 +41,8 @@ namespace DamosAlarmsNTimers {
                 ndx = pf.chklstTimers.CheckedIndices[0];
 
                 txtEditAlarmName.Text = pf.activeTms[ndx].name;
+                //not sure, but perhaps the tmpTarget fields in the next 3
+                //entries really need to be changed to interval methods?
                 nudEditHour.Value = pf.activeTms[ndx].tmpTarget.Hour;
                 nudEditMinute.Value = pf.activeTms[ndx].tmpTarget.Minute;
                 nudEditSecond.Value = pf.activeTms[ndx].tmpTarget.Second;
