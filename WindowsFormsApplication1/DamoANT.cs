@@ -82,8 +82,12 @@ namespace DamosAlarmsNTimers
             public String soundBite;
             public TimeSpan interval;  //may be phasing this out in here soon
 
+            //getters and setters
             public void setInterval() {
                 interval = ringAt - DateTime.Now;
+            }
+            public TimeSpan getInterval() {
+                return interval;
             }
 
             public Boolean checkIfFiring() {
@@ -102,28 +106,6 @@ namespace DamosAlarmsNTimers
                     return false;
                 }
             }
-
-            public String returnCountdown() {
-                String tmpHr, tmpMin, tmpSec;
-
-                if (interval.Hours < 10) {
-                    tmpHr = "0" + interval.Hours.ToString();
-                } else {
-                    tmpHr = interval.Hours.ToString();
-                }
-                if (interval.Minutes < 10) {
-                    tmpMin = "0" + interval.Minutes.ToString();
-                } else {
-                    tmpMin = interval.Minutes.ToString();
-                }
-                if (interval.Seconds < 10) {
-                    tmpSec = "0" + interval.Seconds.ToString();
-                } else {
-                    tmpSec = interval.Seconds.ToString();
-                }
-
-                return (tmpHr + ":" + tmpMin + ":" + tmpSec);
-            }
         }
 
         /*
@@ -139,6 +121,7 @@ namespace DamosAlarmsNTimers
             public Boolean running;
             public String soundBite;
 
+            //getters and setters
             /*
              * this should atone for the crap of the old method below
              * pretty sure I was on drugs back then.  ohOH
@@ -146,7 +129,6 @@ namespace DamosAlarmsNTimers
             public void setInterval(int hrs, int min, int sec) {
                 interval = new TimeSpan(0, hrs, min, sec, 0);
             }
-
             /*
              * just a getter for the interval data
              */
@@ -171,30 +153,32 @@ namespace DamosAlarmsNTimers
                     return false;
                 }
             }
-
-            public String returnCountdown() {
-                String tmpHr, tmpMin, tmpSec;
-
-                if (interval.Hours < 10) {
-                    tmpHr = "0" + interval.Hours.ToString();
-                } else {
-                    tmpHr = interval.Hours.ToString();
-                }
-                if (interval.Minutes < 10) {
-                    tmpMin = "0" + interval.Minutes.ToString();
-                } else {
-                    tmpMin = interval.Minutes.ToString();
-                }
-                if (interval.Seconds < 10) {
-                    tmpSec = "0" + interval.Seconds.ToString();
-                } else {
-                    tmpSec = interval.Seconds.ToString();
-                }
-
-                return (tmpHr + ":" + tmpMin + ":" + tmpSec);
-            }
         }
+        /*
+         * Method returns the countdown for either alarm or timer
+         * (part of modularizing)
+         */
+        public String returnCountdown(TimeSpan interval) {
+            String tmpHr, tmpMin, tmpSec;
 
+            if (interval.Hours < 10) {
+                tmpHr = "0" + interval.Hours.ToString();
+            } else {
+                tmpHr = interval.Hours.ToString();
+            }
+            if (interval.Minutes < 10) {
+                tmpMin = "0" + interval.Minutes.ToString();
+            } else {
+                tmpMin = interval.Minutes.ToString();
+            }
+            if (interval.Seconds < 10) {
+                tmpSec = "0" + interval.Seconds.ToString();
+            } else {
+                tmpSec = interval.Seconds.ToString();
+            }
+
+            return (tmpHr + ":" + tmpMin + ":" + tmpSec);
+        }
         /*
          * Method checks the validity of the time/date object that holds the
          * target time [alarm] or interval [timer--kludge] for the particular
@@ -592,13 +576,13 @@ namespace DamosAlarmsNTimers
                 chklstAlarms.Items.RemoveAt(ndx);
                 chklstAlarms.Items.Insert(ndx,
                     activeAls.ElementAt(ndx).name + ": Remaining: " +
-                    activeAls.ElementAt(ndx).returnCountdown());
+                    returnCountdown(activeAls.ElementAt(ndx).getInterval()));
                 chklstAlarms.SetItemChecked(ndx, true);
             } else {
                 chklstTimers.Items.RemoveAt(ndx);
                 chklstTimers.Items.Insert(ndx,
                     activeTms.ElementAt(ndx).name + ": Remaining: " +
-                    activeTms.ElementAt(ndx).returnCountdown());
+                    returnCountdown(activeTms.ElementAt(ndx).getInterval()));
                 chklstTimers.SetItemChecked(ndx, true);
             }
         }
