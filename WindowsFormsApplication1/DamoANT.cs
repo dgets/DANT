@@ -80,7 +80,9 @@ namespace DamosAlarmsNTimers
             public DateTime ringAt;
             public Boolean running;
             public String soundBite;
-            public TimeSpan interval;  //may be phasing this out in here soon
+
+            private TimeSpan interval;  //may be phasing this out in here soon
+            private Boolean hasRung = false;
 
             //getters and setters
             public void setInterval() {
@@ -89,7 +91,15 @@ namespace DamosAlarmsNTimers
             public TimeSpan getInterval() {
                 return interval;
             }
+            public void setHasRung() {
+                hasRung = true;
+            }
+            public Boolean getHasRung() {
+                return hasRung;
+            }
 
+            //this should, perhaps, have some rewriting taking place now that
+            //'hasRung' has been added to properties
             public Boolean checkIfFiring() {
                 if (alarmDebugging) {
                     Console.WriteLine("Checking if firing\nRunning value for: " +
@@ -117,9 +127,11 @@ namespace DamosAlarmsNTimers
                                           after any pause; this is prolly
                                           where the bugs before were
                                           happening after pause */
-            private TimeSpan interval;
             public Boolean running;
             public String soundBite;
+
+            private TimeSpan interval;
+            private Boolean hasRung = false;
 
             //getters and setters
             /*
@@ -135,7 +147,14 @@ namespace DamosAlarmsNTimers
             public TimeSpan getInterval() {
                 return interval;
             }
+            public void setHasRung() {
+                hasRung = true;
+            }
+            public Boolean getHasRung() {
+                return hasRung;
+            }
 
+            //again, this may need rewriting w/hasRung implementation now
             public Boolean checkIfFiring() {
                 if (timerDebugging) {
                     Console.WriteLine("Checking if firing\nRunning value for: " +
@@ -624,9 +643,13 @@ namespace DamosAlarmsNTimers
                             tmrOneSec.Enabled = false;
                             tmrOneSec.Stop();
                         }
-                        ringRingNeo(true, cntr);
-                        playAudibleAlarm(false,
-                            activeAls.ElementAt(cntr).soundBite, cntr);
+                        if (!activeAls.ElementAt(cntr).getHasRung()) {
+                            activeAls.ElementAt(cntr).setHasRung();
+
+                            ringRingNeo(true, cntr);
+                            playAudibleAlarm(false,
+                                activeAls.ElementAt(cntr).soundBite, cntr);
+                        }
                     }
                 }
             }
@@ -656,13 +679,17 @@ namespace DamosAlarmsNTimers
                             Console.WriteLine("Found activeAls[" +
                                 cntr.ToString() + "] to be firing");
                         }
-                        ringRingNeo(false, cntr);
-                        if (anyRunning(false, true)) {
-                            tmrOneSec.Enabled = false;
-                            tmrOneSec.Stop();
+                        if (!activeTms.ElementAt(cntr).getHasRung()) {
+                            activeTms.ElementAt(cntr).setHasRung();
+
+                            ringRingNeo(false, cntr);
+                            if (anyRunning(false, true)) {
+                                tmrOneSec.Enabled = false;
+                                tmrOneSec.Stop();
+                            }
+                            playAudibleAlarm(false,
+                                activeTms.ElementAt(cntr).soundBite, cntr);
                         }
-                        playAudibleAlarm(false,
-                            activeTms.ElementAt(cntr).soundBite, cntr);
                     } else {
                         var ouah = activeTms.ElementAt(cntr).getInterval();
                         ouah -= new TimeSpan(0, 0, 1);
