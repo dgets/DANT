@@ -66,9 +66,18 @@ namespace DamosAlarmsNTimers
 
             InitializeComponent();
 
-            if (!loadAlarmsTimers()) {
-                MessageBox.Show("Issues loading saved alarms & timers!");
+            try {
+                loadAlarmsTimers();
+            } catch {
+                Console.WriteLine("Error in loadAlarmsTimers()");
+                if (fileIODebugging) {
+                    MessageBox.Show("Error loading alarms and timers");
+                }
             }
+
+            /* if (!loadAlarmsTimers()) {
+                MessageBox.Show("Issues loading saved alarms & timers!");
+            } */
         }
 
         /*
@@ -221,6 +230,9 @@ namespace DamosAlarmsNTimers
         /*
          * Overloaded method that does the same as the above, but taking 
          * parameters passed as an array.
+         * 
+         * It's been way too long since I've been familiar with this code;
+         * why the hell did I do this?
          */
         private DateTime checkAlarmDay(int[] hrMinSec) {
             DateTime ouah = new DateTime(DateTime.Now.Year, DateTime.Now.Month,
@@ -426,15 +438,14 @@ namespace DamosAlarmsNTimers
          * List objects and returns 'true' if no errors are found or throws
          * DANTException upon garbled data or no file found
          */
-        private Boolean loadAlarmsTimers() {
+        private void loadAlarmsTimers() {
             String[] rawFile;
             int aCntr = 0, tCntr = 0; 
             
-            if (chkCfg()) { return true; }
+            if (chkCfg()) { return; }
             rawFile = readCfg();
             if (rawFile == null) {
                 throw new DANTException("Error reading cfg file");
-                return false;
             }
 
             foreach (String raw in rawFile) {
@@ -450,10 +461,10 @@ namespace DamosAlarmsNTimers
                     if (fileIODebugging) {
                         Console.WriteLine("Error parsing saved fields " +
                             "line\n");
-                        throw new DANTException("Error parsing saved " +
-                            "fields line\n");
                     }
-                    rawFields = null;    //not sure what the fuh is going on
+                    rawFields = null;   //don't remember :|
+                    throw new DANTException("Error parsing saved " +
+                        "fields line\n");
                 }
 
                 if (rawFields == null) { 
@@ -474,7 +485,7 @@ namespace DamosAlarmsNTimers
                         "parse the config file!");
                 }
             }
-            return true;
+            return;
         }
 
         /*
@@ -531,12 +542,17 @@ namespace DamosAlarmsNTimers
             tmp.name = fields[1];
             tmp.running = false;
             
-            //this should be changed to include tryParse, perhaps, and throw an
-            //exception if something bogus is added
-            tmp.tmpTarget = DateTime.Now + 
-                            new TimeSpan(0, int.Parse(fields[2]), 
-                                         int.Parse(fields[3]),
-                                         int.Parse(fields[4]));
+            //this should be changed to include tryParse, perhaps, and throw
+            //an exception if something bogus is added
+            try {
+                tmp.tmpTarget = DateTime.Now + 
+                                new TimeSpan(0, int.Parse(fields[2]), 
+                                            int.Parse(fields[3]),
+                                            int.Parse(fields[4]));
+            } catch {
+                throw new DANTException(
+                    "Unable to parse fields for tmpTimer");
+            }
 
             return tmp;
         }
@@ -630,8 +646,7 @@ namespace DamosAlarmsNTimers
                 }
 
                 if (chklstAlarms.GetItemChecked(cntr)) {
-                    //like how the parameters are swapped?  fix that shit
-                    checkAlTmSetInterval(true, cntr);
+                    checkAlTmSetInterval(cntr, true);
                     updateDisplay(cntr, true);
 
                     if (activeAls.ElementAt(cntr).checkIfFiring()) {
@@ -671,7 +686,7 @@ namespace DamosAlarmsNTimers
 
                 if (chklstTimers.GetItemChecked(cntr)) {
                     //like how the parameters are swapped?  FIX THAT SHIT
-                    checkAlTmSetInterval(false, cntr);
+                    checkAlTmSetInterval(cntr, false);
                     updateDisplay(cntr, false);
 
                     if (activeTms.ElementAt(cntr).checkIfFiring()) {
@@ -708,7 +723,7 @@ namespace DamosAlarmsNTimers
          * is set is redundant, and this should be made less stupid, as well
          * as the setting of the running property to 'true' repeatedly
          */
-        private void checkAlTmSetInterval(Boolean alarm, int ndx) {
+        private void checkAlTmSetInterval(int ndx, Boolean alarm) {
             if (alarm) {
                 if (activeAls.ElementAt(ndx).running == false) {
                     activeAls.ElementAt(ndx).running = true;
@@ -1116,7 +1131,6 @@ namespace DamosAlarmsNTimers
                 MessageBox.Show("Invalid timer duration!", "Zero Timer",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw new DANTException("Invalid timer duration");
-                //return false;
             }
             return true;
         }
@@ -1181,6 +1195,7 @@ namespace DamosAlarmsNTimers
          * at this point, though this will probably be expounded upon in the future
          */
         private void btnGetHelp_Click(object sender, EventArgs e) {
+            Console.WriteLine("generalDebugging: " + generalDebugging);
             if (generalDebugging) {
                 Console.WriteLine("Click to enter help window picked up");
             }
