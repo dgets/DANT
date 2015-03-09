@@ -47,7 +47,7 @@ namespace DamosAlarmsNTimers
         public const Boolean alarmDebugging = false;
         public const Boolean timerDebugging = true;
         public const Boolean tickDebugging = true;
-        public const Boolean fileIODebugging = false;
+        public const Boolean fileIODebugging = true;
 
         private String cfgFile;
 
@@ -406,20 +406,38 @@ namespace DamosAlarmsNTimers
          */
         private string createCfgCSVString(Boolean alarm, int cntr) {
             if (alarm) {
-                return ("A," + activeAls[cntr].name + "," +
+                var ouah = "A," + activeAls[cntr].name + "," +
                     activeAls[cntr].ringAt.Hour + "," +
                     activeAls[cntr].ringAt.Minute + "," +
                     activeAls[cntr].ringAt.Second + "," +
-                    activeAls[cntr].soundBite);
+                    activeAls[cntr].soundBite;
+
+                if (fileIODebugging) {
+                    Console.WriteLine("CSV: " + ouah);
+                }
+
+                return ouah;
+                        /* ("A," + activeAls[cntr].name + "," +
+                    activeAls[cntr].ringAt.Hour + "," +
+                    activeAls[cntr].ringAt.Minute + "," +
+                    activeAls[cntr].ringAt.Second + "," +
+                    activeAls[cntr].soundBite); */
             } else {
-                var iv = new TimeSpan();
-                //changed this to reflect the interval
-                iv = activeTms[cntr].getInterval();
-                return ("T," + activeTms[cntr].name + "," +
+                var iv = activeTms[cntr].getInterval();
+                //is the interval what we wanted to do here?  I need to review
+                //the structure of the timers' data storage
+
+                var ouah = "T," + activeTms[cntr].name + "," +
                     iv.Hours + "," +
                     iv.Minutes + "," +
                     iv.Seconds + "," +
-                    activeTms[cntr].soundBite);
+                    activeTms[cntr].soundBite;
+
+                if (fileIODebugging) {
+                    Console.WriteLine("CSV: " + ouah);
+                }
+
+                return ouah;
             }
         }
 
