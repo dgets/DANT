@@ -74,10 +74,6 @@ namespace DamosAlarmsNTimers
                     MessageBox.Show("Error loading alarms and timers");
                 }
             }
-
-            /* if (!loadAlarmsTimers()) {
-                MessageBox.Show("Issues loading saved alarms & timers!");
-            } */
         }
 
         /*
@@ -511,6 +507,10 @@ namespace DamosAlarmsNTimers
                 //a change in the config file at this point, also
                 Alarms tmpAlarm = new Alarms();
                 Timers tmpTimer = new Timers();
+
+                if (fileIODebugging) {
+                    Console.WriteLine("raw: " + raw);
+                }
 
                 try {
                     rawFields = parseSavedFieldsLine(raw);
