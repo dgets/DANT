@@ -77,8 +77,7 @@ namespace DamosAlarmsNTimers
         }
 
         /*
-         * splitting up alarms & timers here, fo' sho' now
-         * Alarms first follow
+         * Alarms first; class defines each alarm entry
          */
         public partial class Alarms {
             public String name;
@@ -143,17 +142,22 @@ namespace DamosAlarmsNTimers
         }
 
         /*
-         * Timers class follows
+         * Timers class follows; each Timer entry is defined as such
+         * 
+         * NOTE: There is still a large amount of confusion/error in
+         * the switch-over to implementation to 'origInterval' utilizing
+         * the 'get/setOrigInterval()' routines.  The previous ones in
+         * place had utilized DateTime construction, so not all modification
+         * went easy, thus leaving things more broken at this point for
+         * timers than they have been for awhile
          */
         public partial class Timers {
             public String name;
-            public DateTime tmpTarget;  /*this needs to be recalculated
-                                          after any pause; this is prolly
-                                          where the bugs before were
-                                          happening after pause */
+            
             //public Boolean running;
             public String soundBite;
 
+            private TimeSpan origInterval;
             private TimeSpan interval;
             private Boolean hasRung = false;
             private Boolean running;
@@ -166,9 +170,6 @@ namespace DamosAlarmsNTimers
             public void setInterval(int hrs, int min, int sec) {
                 interval = new TimeSpan(0, hrs, min, sec, 0);
             }
-            /*
-             * just a getter for the interval data
-             */
             public TimeSpan getInterval() {
                 return interval;
             }
@@ -183,6 +184,12 @@ namespace DamosAlarmsNTimers
             }
             public Boolean getRunning() {
                 return running;
+            }
+            public TimeSpan getOrigInterval() {
+                return origInterval;
+            }
+            public void setOrigInterval(TimeSpan newtime) {
+                origInterval = newtime;
             }
 
             /*
@@ -217,6 +224,7 @@ namespace DamosAlarmsNTimers
                 }
             }
         }
+
         /*
          * Method returns the countdown for either alarm or timer
          * (part of modularizing)
@@ -242,6 +250,7 @@ namespace DamosAlarmsNTimers
 
             return (tmpHr + ":" + tmpMin + ":" + tmpSec);
         }
+
         /*
          * Method checks the validity of the time/date object that holds the
          * target time [alarm] or interval [timer--kludge] for the particular
@@ -413,20 +422,15 @@ namespace DamosAlarmsNTimers
                 }
 
                 return ouah;
-                        /* ("A," + activeAls[cntr].name + "," +
-                    activeAls[cntr].ringAt.Hour + "," +
-                    activeAls[cntr].ringAt.Minute + "," +
-                    activeAls[cntr].ringAt.Second + "," +
-                    activeAls[cntr].soundBite); */
             } else {
-                var iv = activeTms[cntr].getInterval();
+                var oiv = activeTms[cntr].getOrigInterval();
                 //is the interval what we wanted to do here?  I need to review
                 //the structure of the timers' data storage
 
                 var ouah = "T," + activeTms[cntr].name + "," +
-                    iv.Hours + "," +
-                    iv.Minutes + "," +
-                    iv.Seconds + "," +
+                    oiv.Hours + "," +
+                    oiv.Minutes + "," +
+                    oiv.Seconds + "," +
                     activeTms[cntr].soundBite;
 
                 if (fileIODebugging) {
@@ -574,6 +578,10 @@ namespace DamosAlarmsNTimers
             } else { return false; }
         }
 
+        /*
+         * Method creates a temporary Alarm entry to be utilized
+         * prior to pushing onto the list
+         */
         private Alarms createTmpAlarm(string[] fields) {
             if (fields[0] == null) { return null; }
             if (fields[0].CompareTo("A") != 0) { return null; }
@@ -590,11 +598,16 @@ namespace DamosAlarmsNTimers
             return tmp;
         }
 
+        /*
+         * Method creates a temporary timer to be utilized before
+         * pushing it onto the active stack of timers
+         */
         private Timers createTmpTimer(string[] fields) {
             if (fields[0] == null) { return null; }
             if (fields[0].CompareTo("T") != 0) { return null; }
 
             Timers tmp = new Timers();
+            int[] ouah;
 
             tmp.name = fields[1];
             tmp.setRunning(false);
@@ -602,14 +615,19 @@ namespace DamosAlarmsNTimers
             //this should be changed to include tryParse, perhaps, and throw
             //an exception if something bogus is added
             try {
-                tmp.tmpTarget = DateTime.Now + 
-                                new TimeSpan(0, int.Parse(fields[2]), 
-                                            int.Parse(fields[3]),
-                                            int.Parse(fields[4]));
+                for (int guh = 0; guh < 3; guh++) {
+                    ouah[guh] = int.Parse(fields[guh + 2]);
+                }
             } catch {
                 throw new DANTException(
                     "Unable to parse fields for tmpTimer");
             }
+            //we now need this in 'interval', also, as that one will be used
+            //for counting down
+            //in hindsight, these should both be set by TimeSpan, not one by
+            //such and the other by 3 integers :P
+            tmp.setOrigInterval(new TimeSpan(ouah[0], ouah[1], ouah[2]));
+            tmp.setInterval(ouah[0], ouah[1], ouah[2]);
 
             return tmp;
         }
@@ -620,18 +638,16 @@ namespace DamosAlarmsNTimers
         private void addAlarm(int alarmNo) {
             chklstAlarms.Items.Insert(alarmNo,
                 (activeAls.ElementAt(alarmNo).name + " -> " +
-                 addZeroesToTime(activeAls.ElementAt(alarmNo).ringAt)));
+                 addZeroesToAlarm(activeAls.ElementAt(alarmNo).ringAt)));
         }
 
         /*
          * Method adds timer to appropriate checklist
-         * NOTE: This needs to be fixed to add the interval info, not tmpTarget
-         * We really should just get rid of that shit completely
          */
         private void addTimer(int timerNo) {
             chklstTimers.Items.Insert(timerNo,
                 (activeTms.ElementAt(timerNo).name + " -> " +
-                 activeTms.ElementAt(timerNo).getInterval().ToString()));
+                 activeTms.ElementAt(timerNo).getOrigInterval().ToString()));
         }
 
         /*
@@ -646,14 +662,15 @@ namespace DamosAlarmsNTimers
                 chklstAlarms.Items.RemoveAt(ndx);
                 chklstAlarms.Items.Insert(ndx,
                     (activeAls.ElementAt(ndx).name + " -> " +
-                     addZeroesToTime(activeAls.ElementAt(ndx).ringAt)));
+                     addZeroesToAlarm(activeAls.ElementAt(ndx).ringAt)));
             } else {
                 activeTms.ElementAt(ndx).setRunning(false);
                 //checklist, etc etc etc
                 chklstTimers.Items.RemoveAt(ndx);
                 chklstTimers.Items.Insert(ndx,
                     (activeTms.ElementAt(ndx).name + " -> " +
-                     addZeroesToTime(activeTms.ElementAt(ndx).tmpTarget)));
+                     addZeroesToTimer(
+                        activeTms.ElementAt(ndx).getOrigInterval())));
                 //and again we should get rid of the tmpTarget shit in favor
                 //of the interval completely
             }
@@ -794,18 +811,19 @@ namespace DamosAlarmsNTimers
             } else {
                 if (activeTms.ElementAt(ndx).getRunning() == false) {
                     activeTms.ElementAt(ndx).setRunning(true);
-                    activeTms.ElementAt(ndx).tmpTarget =
-                        DateTime.Now + activeTms.ElementAt(ndx).getInterval();
+                    //activeTms.ElementAt(ndx).tmpTarget =
+                        //DateTime.Now + activeTms.ElementAt(ndx).getInterval();
                     //why does this only have debugging output for timer?
                     if (tickDebugging || timerDebugging) {
                         Console.WriteLine("tmpTarget for Timer #" +
                             ndx.ToString() + " set to " +
-                            activeTms.ElementAt(ndx).tmpTarget.ToString());
+                            activeTms.ElementAt(ndx).getInterval());
                     }
                 }
                 //activeTms.ElementAt(ndx).setInterval(); //BUG
             }
         }
+
         /*
          * Method simply plays the audio or the beep: trying to modularize code
          */
@@ -828,6 +846,7 @@ namespace DamosAlarmsNTimers
 
             return wp;
         }
+
         /*
          * Method plays the audible alarm specified in the respective List
          * object and waits for user interaction to remove the item from
@@ -841,6 +860,7 @@ namespace DamosAlarmsNTimers
 
             wp.controls.stop(); //this needs to only happen after a keypress
         }
+
         /*
          * Method sets respective checklist text to 'ring ring, neo'
          */
@@ -874,7 +894,12 @@ namespace DamosAlarmsNTimers
             }
         }
 
-        private void chklstAlarms_SelectedIndexChanged(object sender, EventArgs e) {
+        /*
+         * Method is to be employed any time the selected index in the 
+         * Alarms list ends up changing
+         */
+        private void chklstAlarms_SelectedIndexChanged(object sender, 
+                                                       EventArgs e) {
             //this works beautifully
             this.BeginInvoke(new MethodInvoker(checkActiveAlarms), null);
         }
@@ -1051,8 +1076,7 @@ namespace DamosAlarmsNTimers
                 chklstAlarms.SetItemChecked(ndx, false);
             } else {
                 activeTms[ndx].name = an;
-                activeTms[ndx].tmpTarget = new DateTime(DateTime.Now.Year,
-                    DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
+                activeTms[ndx].setOrigInterval(new TimeSpan(hr, min, sec));
                 activeTms[ndx].soundBite = fn;
                 activeTms[ndx].setRunning(false);
                 activeTms[ndx].setInterval(hr, min, sec);
@@ -1073,7 +1097,38 @@ namespace DamosAlarmsNTimers
          * Method pads single digit time entities with zeroes for more
          * aesthetically proper display
          */
-        private String addZeroesToTime(DateTime ouah) {
+        private String addZeroesToTimer(TimeSpan ouah) {
+            int hr, min, sec;
+            String targetZeroesAdded;
+
+            hr = ouah.Hours; min = ouah.Minutes; sec = ouah.Seconds;
+
+            if (hr < 10) {
+                targetZeroesAdded = "0" + hr.ToString();
+            } else {
+                targetZeroesAdded = hr.ToString();
+            }
+            targetZeroesAdded += ":";
+            if (min < 10) {
+                targetZeroesAdded += "0" + min.ToString();
+            } else {
+                targetZeroesAdded += min.ToString();
+            }
+            targetZeroesAdded += ":";
+            if (sec < 10) {
+                targetZeroesAdded += "0" + sec.ToString();
+            } else {
+                targetZeroesAdded += sec.ToString();
+            }
+
+            return targetZeroesAdded;
+        }
+
+        /*
+         * Method padds the single zero strings in an alarm entry in order to
+         * make them more visually appealing as above (so below ahrhrhr)
+         */
+        private String addZeroesToAlarm(DateTime ouah) {
             int hr, min, sec;
             String targetZeroesAdded;
 
@@ -1103,6 +1158,23 @@ namespace DamosAlarmsNTimers
         /*
          * Method handles adding new timer data to the appropriate List
          * objects and checklist
+         * 
+         * NOTE: Currently depreciated
+         */
+        /*private void btnAddTimer_Click(object sender, EventArgs e) {
+            if (txtTimerName.Text.CompareTo("") == 0) {
+                MessageBox.Show("You must enter a timer name!",
+                    "Timer Name Required");
+            }
+            if (!legitTime((int)numTimerHr.Value, (int)numTimerMin.Value,
+                                (int)numTimerSec.Value, false)) {
+                throw new DANTException("Not legit time from legitTime()\n");
+            }
+        } */
+
+        /*
+         * Method handles adding new timer data to the appropriate List
+         * objects and checklist
          */
         private void btnAddTimer_Click(object sender, EventArgs e) {
             if (txtTimerName.Text.CompareTo("") == 0) {
@@ -1120,6 +1192,10 @@ namespace DamosAlarmsNTimers
             tmpTimer.setInterval((int) numTimerHr.Value, 
                                  (int) numTimerMin.Value,
                                  (int) numTimerSec.Value);
+            tmpTimer.setOrigInterval(new TimeSpan((int) numTimerHr.Value,
+                                      (int) numTimerMin.Value,
+                                      (int) numTimerSec.Value));
+
             tmpTimer.setRunning(false);
             tmpTimer.soundBite = soundByteSelection();
 
@@ -1228,7 +1304,7 @@ namespace DamosAlarmsNTimers
                     //enable timer if it hasn't been handled already
                     if (tmrOneSec.Enabled == false) {
                         //not sure if this is correct in the 'if' conditional
-                        if (activeTms.ElementAt(temp).tmpTarget ==
+                        /*if (activeTms.ElementAt(temp).tmpTarget ==
                             (DateTime.Now + 
                              activeTms.ElementAt(temp).getInterval())) {
                             /*
@@ -1236,9 +1312,9 @@ namespace DamosAlarmsNTimers
                              * need to separate AlarmsTimers into 2 classes,
                              * one for each sort of list to avoid this kludge
                              */
-                            activeTms.ElementAt(temp).tmpTarget =
+                            /* activeTms.ElementAt(temp).tmpTarget =
                                 DateTime.Now + activeTms.ElementAt(temp).getInterval();
-                        }
+                        }*/
                         activeTms.ElementAt(temp).setRunning(true);
                         tmrOneSec.Enabled = true;
                         tmrOneSec.Start();
@@ -1250,6 +1326,8 @@ namespace DamosAlarmsNTimers
         /*
          * Method is used to display general help for the application, nothing more
          * at this point, though this will probably be expounded upon in the future
+         * 
+         * BUG: Shit won't show no matter what right now :(
          */
         private void btnGetHelp_Click(object sender, EventArgs e) {
             Console.WriteLine("generalDebugging: " + generalDebugging);
