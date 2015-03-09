@@ -87,11 +87,11 @@ namespace DamosAlarmsNTimers
         public partial class Alarms {
             public String name;
             public DateTime ringAt;
-            public Boolean running;
             public String soundBite;
 
             private TimeSpan interval;  //may be phasing this out in here soon
             private Boolean hasRung = false;
+            private Boolean running;
 
             //getters and setters
             public void setInterval() {
@@ -105,6 +105,25 @@ namespace DamosAlarmsNTimers
             }
             public Boolean getHasRung() {
                 return hasRung;
+            }
+            public void setRunning(Boolean isRunning) {
+                running = isRunning;
+            }
+            public Boolean getRunning() {
+                return running;
+            }
+
+            /*
+             * toggles the state of the running flag and returns its new
+             * value
+             */
+            public Boolean toggleRunning() {
+                if (running == true) {
+                    running = false;
+                } else {
+                    running = true;
+                }
+                return running;
             }
 
             //this should, perhaps, have some rewriting taking place now that
@@ -136,11 +155,12 @@ namespace DamosAlarmsNTimers
                                           after any pause; this is prolly
                                           where the bugs before were
                                           happening after pause */
-            public Boolean running;
+            //public Boolean running;
             public String soundBite;
 
             private TimeSpan interval;
             private Boolean hasRung = false;
+            private Boolean running;
 
             //getters and setters
             /*
@@ -161,6 +181,25 @@ namespace DamosAlarmsNTimers
             }
             public Boolean getHasRung() {
                 return hasRung;
+            }
+            public void setRunning(Boolean isRunning) {
+                running = isRunning;
+            }
+            public Boolean getRunning() {
+                return running;
+            }
+
+            /*
+             * toggles the state of the running flag and returns its new
+             * value
+             */
+            public Boolean toggleRunning() {
+                if (running == true) {
+                    running = false;
+                } else {
+                    running = true;
+                }
+                return running;
             }
 
             //again, this may need rewriting w/hasRung implementation now
@@ -526,7 +565,7 @@ namespace DamosAlarmsNTimers
             Alarms tmp = new Alarms();
 
             tmp.name = fields[1];
-            tmp.running = false;
+            tmp.setRunning(false);
             tmp.ringAt = checkAlarmDay(convertSavedFields(fields));
             tmp.soundBite = fields[5];
 
@@ -540,7 +579,7 @@ namespace DamosAlarmsNTimers
             Timers tmp = new Timers();
 
             tmp.name = fields[1];
-            tmp.running = false;
+            tmp.setRunning(false);
             
             //this should be changed to include tryParse, perhaps, and throw
             //an exception if something bogus is added
@@ -584,14 +623,14 @@ namespace DamosAlarmsNTimers
          */
         private void unsetItem(int ndx, Boolean alarm) {
             if (alarm) {
-                activeAls.ElementAt(ndx).running = false;
+                activeAls.ElementAt(ndx).setRunning(false);
                 //reset the checklist, too
                 chklstAlarms.Items.RemoveAt(ndx);
                 chklstAlarms.Items.Insert(ndx,
                     (activeAls.ElementAt(ndx).name + " -> " +
                      addZeroesToTime(activeAls.ElementAt(ndx).ringAt)));
             } else {
-                activeTms.ElementAt(ndx).running = false;
+                activeTms.ElementAt(ndx).setRunning(false);
                 //checklist, etc etc etc
                 chklstTimers.Items.RemoveAt(ndx);
                 chklstTimers.Items.Insert(ndx,
@@ -725,8 +764,8 @@ namespace DamosAlarmsNTimers
          */
         private void checkAlTmSetInterval(int ndx, Boolean alarm) {
             if (alarm) {
-                if (activeAls.ElementAt(ndx).running == false) {
-                    activeAls.ElementAt(ndx).running = true;
+                if (activeAls.ElementAt(ndx).getRunning() == false) {
+                    activeAls.ElementAt(ndx).setRunning(true);
                     activeAls.ElementAt(ndx).ringAt =
                         checkAlarmDay(
                             (int)activeAls.ElementAt(ndx).ringAt.Hour,
@@ -735,8 +774,8 @@ namespace DamosAlarmsNTimers
                 }
                 activeAls.ElementAt(ndx).setInterval();
             } else {
-                if (activeTms.ElementAt(ndx).running == false) {
-                    activeTms.ElementAt(ndx).running = true;
+                if (activeTms.ElementAt(ndx).getRunning() == false) {
+                    activeTms.ElementAt(ndx).setRunning(true);
                     activeTms.ElementAt(ndx).tmpTarget =
                         DateTime.Now + activeTms.ElementAt(ndx).getInterval();
                     //why does this only have debugging output for timer?
@@ -870,7 +909,7 @@ namespace DamosAlarmsNTimers
             foreach (int temp in chklstAlarms.CheckedIndices) {
                 //these are specifically checked, so double checking that in the
                 //conditional should not be necessary
-                if (activeAls.ElementAt(temp).running != true) {
+                if (activeAls.ElementAt(temp).getRunning() != true) {
                     if (alarmDebugging) {
                         Console.WriteLine("Flagged alarm #" + temp.ToString());
                     }
@@ -883,7 +922,7 @@ namespace DamosAlarmsNTimers
 
                     //enable timer if it hasn't been handled already
                     if (tmrOneSec.Enabled == false) {
-                        activeAls.ElementAt(temp).running = true;
+                        activeAls.ElementAt(temp).setRunning(true);
                         tmrOneSec.Enabled = true;
                         tmrOneSec.Start();
                     }
@@ -988,7 +1027,7 @@ namespace DamosAlarmsNTimers
                 activeAls[ndx].ringAt = new DateTime(DateTime.Now.Year,
                     DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
                 activeAls[ndx].soundBite = fn;
-                activeAls[ndx].running = false;
+                activeAls[ndx].setRunning(false);
                 activeAls[ndx].setInterval();
 
                 chklstAlarms.SetItemChecked(ndx, false);
@@ -997,7 +1036,7 @@ namespace DamosAlarmsNTimers
                 activeTms[ndx].tmpTarget = new DateTime(DateTime.Now.Year,
                     DateTime.Now.Month, DateTime.Now.Day, hr, min, sec);
                 activeTms[ndx].soundBite = fn;
-                activeTms[ndx].running = false;
+                activeTms[ndx].setRunning(false);
                 activeTms[ndx].setInterval(hr, min, sec);
                 chklstTimers.SetItemChecked(ndx, false);
             }
@@ -1063,7 +1102,7 @@ namespace DamosAlarmsNTimers
             tmpTimer.setInterval((int) numTimerHr.Value, 
                                  (int) numTimerMin.Value,
                                  (int) numTimerSec.Value);
-            tmpTimer.running = false;
+            tmpTimer.setRunning(false);
             tmpTimer.soundBite = soundByteSelection();
 
             grayItemNameBoxNResetNumerics(false);
@@ -1163,7 +1202,7 @@ namespace DamosAlarmsNTimers
             foreach (int temp in chklstTimers.CheckedIndices) {
                 //these are specifically checked, so double checking that in the
                 //conditional should not be necessary
-                if (activeTms.ElementAt(temp).running != true) {
+                if (activeTms.ElementAt(temp).getRunning() != true) {
                     if (timerDebugging) {
                         Console.WriteLine("Flagged timer #" + temp.ToString());
                     }
@@ -1182,7 +1221,7 @@ namespace DamosAlarmsNTimers
                             activeTms.ElementAt(temp).tmpTarget =
                                 DateTime.Now + activeTms.ElementAt(temp).getInterval();
                         }
-                        activeTms.ElementAt(temp).running = true;
+                        activeTms.ElementAt(temp).setRunning(true);
                         tmrOneSec.Enabled = true;
                         tmrOneSec.Start();
                     }
