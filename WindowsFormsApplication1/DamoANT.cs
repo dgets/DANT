@@ -607,7 +607,7 @@ namespace DamosAlarmsNTimers
             if (fields[0].CompareTo("T") != 0) { return null; }
 
             Timers tmp = new Timers();
-            int[] ouah;
+            int[] ouah = null;
 
             tmp.name = fields[1];
             tmp.setRunning(false);
