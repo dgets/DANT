@@ -72,3 +72,5 @@ C:\Users\Domingo Sontag\Documents\Visual Studio 2010\Projects\DANT\WindowsFormsA
 C:\Users\Domingo Sontag\Documents\Visual Studio 2010\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.exe
 C:\Users\Domingo Sontag\Documents\Visual Studio 2010\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.pdb
 C:\Users\Domingo Sontag\Documents\Visual Studio 2010\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.frmHelp.resources
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\Interop.WMPLib.dll
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.csproj.ResolveComReference.cache

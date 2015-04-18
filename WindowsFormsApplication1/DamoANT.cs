@@ -1023,6 +1023,10 @@ namespace DamosAlarmsNTimers
             foreach (int ndx in chklstAlarms.CheckedIndices) {
                 //need to add code in here to stop timer from ticking if
                 //necessary (if this was the only active alarm/timer)
+                if (activeAls[ndx].getRunning())
+                {
+                    activeAls[ndx].toggleRunning();
+                }
                 chklstAlarms.Items.RemoveAt(ndx);
                 activeAls.RemoveAt(ndx);
                 try {
