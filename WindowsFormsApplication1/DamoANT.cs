@@ -198,6 +198,9 @@ namespace DamosAlarmsNTimers
              */
             public Boolean toggleRunning() {
                 if (running == true) {
+                    //there needs to be modification near here in order to support
+                    //changing the time display to show time left if it is not the same
+                    //as the total time remaining
                     running = false;
                 } else {
                     running = true;
@@ -483,7 +486,7 @@ namespace DamosAlarmsNTimers
                     "try to find out what the hell is going on and " +
                     "try again later.");
                 tmpTimes[0] = 0; tmpTimes[1] = 0; tmpTimes[2] = 0;
-                throw new DANTException("Error parsing cfgFIle fields");
+                throw new DANTException("Error parsing cfgFile fields");
             }
             return tmpTimes;
         }
@@ -670,9 +673,10 @@ namespace DamosAlarmsNTimers
                 chklstTimers.Items.Insert(ndx,
                     (activeTms.ElementAt(ndx).name + " -> " +
                      addZeroesToTimer(
-                        activeTms.ElementAt(ndx).getOrigInterval())));
-                //and again we should get rid of the tmpTarget shit in favor
-                //of the interval completely
+                        activeTms.ElementAt(ndx).getOrigInterval())) +
+                    ": Rem -> " + (addZeroesToTimer(
+                        activeTms.ElementAt(ndx).getInterval())));
+                    
             }
         }
 
@@ -1023,8 +1027,7 @@ namespace DamosAlarmsNTimers
             foreach (int ndx in chklstAlarms.CheckedIndices) {
                 //need to add code in here to stop timer from ticking if
                 //necessary (if this was the only active alarm/timer)
-                if (activeAls[ndx].getRunning())
-                {
+                if (activeAls[ndx].getRunning()) {
                     activeAls[ndx].toggleRunning();
                 }
                 chklstAlarms.Items.RemoveAt(ndx);

@@ -74,3 +74,13 @@ C:\Users\Domingo Sontag\Documents\Visual Studio 2010\Projects\DANT\WindowsFormsA
 C:\Users\Domingo Sontag\Documents\Visual Studio 2010\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.frmHelp.resources
 C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\Interop.WMPLib.dll
 C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.csproj.ResolveComReference.cache
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\bin\Debug\DamosAlarmsNTimers.exe
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\bin\Debug\DamosAlarmsNTimers.pdb
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.csprojResolveAssemblyReference.cache
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.frmDamoANTs.resources
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.frmEditWindow.resources
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.frmHelp.resources
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.Properties.Resources.resources
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.csproj.GenerateResource.Cache
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.exe
+C:\Users\Domingo Sontag\Documents\Visual Studio 2013\Projects\DANT\WindowsFormsApplication1\obj\x86\Debug\DamosAlarmsNTimers.pdb
