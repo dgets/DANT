@@ -505,6 +505,7 @@ namespace DamosAlarmsNTimers
             int aCntr = 0, tCntr = 0; 
             
             if (chkCfg()) { return; }
+
             rawFile = readCfg();
             if (rawFile == null) {
                 throw new DANTException("Error reading cfg file");
@@ -533,8 +534,11 @@ namespace DamosAlarmsNTimers
                         "fields line\n");
                 }
 
-                if (rawFields == null) { 
-                    break; 
+                if (rawFields == null) {
+                    if (fileIODebugging) {
+                        Console.WriteLine("null string");
+                    }
+                    continue; 
                 } else if (rawFields[0].CompareTo("A") == 0) {
                     tmpAlarm = createTmpAlarm(rawFields);
                     activeAls.Add(tmpAlarm);
