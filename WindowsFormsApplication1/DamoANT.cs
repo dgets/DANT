@@ -68,10 +68,12 @@ namespace DamosAlarmsNTimers
 
             try {
                 loadAlarmsTimers();
-            } catch {
-                Console.WriteLine("Error in loadAlarmsTimers()");
+            } catch (Exception e) {
+                Console.WriteLine("Error in loadAlarmsTimers():");
+                Console.WriteLine(e.Message);
                 if (fileIODebugging) {
-                    MessageBox.Show("Error loading alarms and timers");
+                    MessageBox.Show("Error loading alarms and timers\n" +
+                        e.Message);
                 }
             }
         }
@@ -365,7 +367,7 @@ namespace DamosAlarmsNTimers
         private Boolean saveAlarmsTimers() {
             int cntr;
 
-            if (activeAls.Count() == 0) { return false; }
+            if (activeAls.Count() == 0) { return false; }   //wut? no timers?
             
             System.IO.StreamWriter cFile = 
                 new System.IO.StreamWriter(cfgFile);
@@ -614,23 +616,29 @@ namespace DamosAlarmsNTimers
 
             tmp.name = fields[1];
             tmp.setRunning(false);
-            
+            ouah = convertSavedFields(fields);
+            tmp.setInterval(ouah[0], ouah[1], ouah[2]);
+
             //this should be changed to include tryParse, perhaps, and throw
             //an exception if something bogus is added
-            try {
+            /*try {
                 for (int guh = 0; guh < 3; guh++) {
+                    if (fileIODebugging) {
+                        Console.WriteLine("Field " + (guh + 2) + ": " + 
+                            fields[guh + 2]);
+                    }
                     ouah[guh] = int.Parse(fields[guh + 2]);
                 }
             } catch {
                 throw new DANTException(
                     "Unable to parse fields for tmpTimer");
-            }
+            }*/
             //we now need this in 'interval', also, as that one will be used
             //for counting down
             //in hindsight, these should both be set by TimeSpan, not one by
             //such and the other by 3 integers :P
             tmp.setOrigInterval(new TimeSpan(ouah[0], ouah[1], ouah[2]));
-            tmp.setInterval(ouah[0], ouah[1], ouah[2]);
+            //tmp.setInterval(ouah[0], ouah[1], ouah[2]);
 
             return tmp;
         }
