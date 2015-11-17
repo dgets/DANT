@@ -727,11 +727,15 @@ namespace DamosAlarmsNTimers
          */
         private void tickDoAlarms() {
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
+                if (tickDebugging && (cntr == 0)) {
+                    Console.WriteLine("Alarm Tick");
+                }
+
                 if (!chklstAlarms.GetItemChecked(cntr)) {
-                    if (tickDebugging) {
+                    /*if (tickDebugging) {
                         Console.WriteLine("Non-Active Alarm #" +
                             cntr.ToString() + " being unset");
-                    }
+                    }*/
                     unsetItem(cntr, true);
                 }
 
@@ -766,11 +770,15 @@ namespace DamosAlarmsNTimers
          */
         private void tickDoTimers() {
             for (int cntr = 0; cntr < activeTms.Count; cntr++) {
+                if (tickDebugging && (cntr == 0)) {
+                    Console.WriteLine("Timer Tick");
+                }
+                
                 if (!chklstTimers.GetItemChecked(cntr)) {
-                    if (tickDebugging) {
+                    /*if (tickDebugging) {
                         Console.WriteLine("Non-Active Timer #" +
                             cntr.ToString() + " being unset");
-                    }
+                    }*/
                     unsetItem(cntr, false);
                 }
 
