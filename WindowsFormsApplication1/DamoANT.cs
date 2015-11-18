@@ -755,7 +755,7 @@ namespace DamosAlarmsNTimers
                         if (!activeAls.ElementAt(cntr).getHasRung()) {
                             activeAls.ElementAt(cntr).setHasRung();
 
-                            ringRingNeo(true, cntr);
+                            //ringRingNeo(true, cntr);
                             playAudibleAlarm(false,
                                 activeAls.ElementAt(cntr).soundBite, cntr);
                         }
@@ -795,7 +795,7 @@ namespace DamosAlarmsNTimers
                         if (!activeTms.ElementAt(cntr).getHasRung()) {
                             activeTms.ElementAt(cntr).setHasRung();
 
-                            ringRingNeo(false, cntr);
+                            //ringRingNeo(false, cntr);
                             if (anyRunning(false, true)) {
                                 tmrOneSec.Enabled = false;
                                 tmrOneSec.Stop();
