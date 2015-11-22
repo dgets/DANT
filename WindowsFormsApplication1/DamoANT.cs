@@ -731,15 +731,18 @@ namespace DamosAlarmsNTimers
                     Console.WriteLine("Alarm Tick");
                 }
 
-                if (!chklstAlarms.GetItemChecked(cntr)) {
-                    /*if (tickDebugging) {
+                /*if (!chklstAlarms.GetItemChecked(cntr)) {
+                    if (tickDebugging) {
                         Console.WriteLine("Non-Active Alarm #" +
                             cntr.ToString() + " being unset");
-                    }*/
+                    }
                     unsetItem(cntr, true);
-                }
+                }*/
 
                 if (chklstAlarms.GetItemChecked(cntr)) {
+                    if (tickDebugging) {
+                        Console.WriteLine("Checked: " + cntr);
+                    }
                     checkAlTmSetInterval(cntr, true);
                     updateDisplay(cntr, true);
 
@@ -748,10 +751,10 @@ namespace DamosAlarmsNTimers
                             Console.WriteLine("Found activeAls[" +
                                 cntr.ToString() + "] to be firing");
                         }
-                        if (anyRunning(false, true)) {
+                        /*if (anyRunning(false, true)) {
                             tmrOneSec.Enabled = false;
                             tmrOneSec.Stop();
-                        }
+                        }*/
                         if (!activeAls.ElementAt(cntr).getHasRung()) {
                             activeAls.ElementAt(cntr).setHasRung();
 
@@ -760,6 +763,8 @@ namespace DamosAlarmsNTimers
                                 activeAls.ElementAt(cntr).soundBite, cntr);
                         }
                     }
+                } else {
+                    unsetItem(cntr, true);
                 }
             }
         }
@@ -774,15 +779,17 @@ namespace DamosAlarmsNTimers
                     Console.WriteLine("Timer Tick");
                 }
                 
-                if (!chklstTimers.GetItemChecked(cntr)) {
-                    /*if (tickDebugging) {
+                /*if (!chklstTimers.GetItemChecked(cntr)) {
+                    if (tickDebugging) {
                         Console.WriteLine("Non-Active Timer #" +
                             cntr.ToString() + " being unset");
-                    }*/
+                    }
                     unsetItem(cntr, false);
-                }
+                }*/
 
                 if (chklstTimers.GetItemChecked(cntr)) {
+                    Console.WriteLine("Checked: " + cntr);
+
                     //like how the parameters are swapped?  FIX THAT SHIT
                     checkAlTmSetInterval(cntr, false);
                     updateDisplay(cntr, false);
@@ -795,11 +802,10 @@ namespace DamosAlarmsNTimers
                         if (!activeTms.ElementAt(cntr).getHasRung()) {
                             activeTms.ElementAt(cntr).setHasRung();
 
-                            //ringRingNeo(false, cntr);
-                            if (anyRunning(false, true)) {
+                            /*if (anyRunning(false, true)) {
                                 tmrOneSec.Enabled = false;
                                 tmrOneSec.Stop();
-                            }
+                            }*/
                             playAudibleAlarm(false,
                                 activeTms.ElementAt(cntr).soundBite, cntr);
                         }
@@ -809,6 +815,8 @@ namespace DamosAlarmsNTimers
                         activeTms.ElementAt(cntr).setInterval(ouah.Hours,
                             ouah.Minutes, ouah.Seconds);
                     }
+                } else {
+                    unsetItem(cntr, false);
                 }
             }
         }
@@ -934,22 +942,58 @@ namespace DamosAlarmsNTimers
          */
         private Boolean anyRunning(Boolean onlyAlarms, Boolean checkAll) {
             if (checkAll) {
+                if (generalDebugging) {
+                    Console.Write("Checking all alarms/timers: ");
+                }
+
                 if ((chklstAlarms.CheckedIndices.Count == 0) &&
                     (chklstTimers.CheckedIndices.Count == 0)) {
+                    if (generalDebugging) {
+                        Console.WriteLine("None checked");
+                    }
+                    
                     return false;
                 } else {
+                    if (generalDebugging) {
+                        Console.WriteLine("Found checked");
+                    }
+
                     return true;
                 }
             } else if (onlyAlarms) {
+                if (generalDebugging) { 
+                    Console.Write("Checking alarms: ");
+                }
+
                 if (chklstAlarms.CheckedIndices.Count == 0) {
+                    if (generalDebugging) {
+                        Console.WriteLine("None checked");
+                    }
+
                     return false;
                 } else {
+                    if (generalDebugging) {
+                        Console.WriteLine("Found checked");
+                    }
+
                     return true;
                 }
             } else {
+                if (generalDebugging) { 
+                    Console.Write("Checking timers: ");
+                }
+
                 if (chklstTimers.CheckedIndices.Count == 0) {
+                    if (generalDebugging) {
+                        Console.WriteLine("None checked");
+                    }
+
                     return false;
                 } else {
+                    if (generalDebugging) { 
+                        Console.WriteLine("Found checked");
+                    }
+
                     return true;
                 }
             }
