@@ -1119,14 +1119,14 @@ namespace DamosAlarmsNTimers
                 MessageBox.Show("You must check an alarm before trying to " +
                     "edit it!");
             } else {
-                editWindow = new frmEditWindow(this, true);
-                editWindow.Show();
-
-                //no workee; timer keeps ticking
-                if (!anyRunning(false, true)) {
+                if (anyRunning(false, true)) {
                     tmrOneSec.Enabled = false;
                     tmrOneSec.Stop();
                 }
+
+                editWindow = new frmEditWindow(this, true);
+                editWindow.Show();
+
             }
         }
 
@@ -1420,14 +1420,14 @@ namespace DamosAlarmsNTimers
                 MessageBox.Show("You must check a timer before trying to " +
                     "edit it!");
             } else {
-                editWindow = new frmEditWindow(this, false);
-                editWindow.Show();
-
-                //no workee; timer keeps ticking
-                if (!anyRunning(false, true)) {
+                if (anyRunning(false, true)) {
                     tmrOneSec.Enabled = false;
                     tmrOneSec.Stop();
                 }
+                
+                editWindow = new frmEditWindow(this, false);
+                editWindow.Show();
+
             }
         }
 
