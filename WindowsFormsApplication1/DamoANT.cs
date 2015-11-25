@@ -731,14 +731,6 @@ namespace DamosAlarmsNTimers
                     Console.WriteLine("Alarm Tick");
                 }
 
-                /*if (!chklstAlarms.GetItemChecked(cntr)) {
-                    if (tickDebugging) {
-                        Console.WriteLine("Non-Active Alarm #" +
-                            cntr.ToString() + " being unset");
-                    }
-                    unsetItem(cntr, true);
-                }*/
-
                 if (chklstAlarms.GetItemChecked(cntr)) {
                     if (tickDebugging) {
                         Console.WriteLine("Checked: " + cntr);
@@ -751,15 +743,11 @@ namespace DamosAlarmsNTimers
                             Console.WriteLine("Found activeAls[" +
                                 cntr.ToString() + "] to be firing");
                         }
-                        /*if (anyRunning(false, true)) {
-                            tmrOneSec.Enabled = false;
-                            tmrOneSec.Stop();
-                        }*/
+
                         if (!activeAls.ElementAt(cntr).getHasRung()) {
                             activeAls.ElementAt(cntr).setHasRung();
 
-                            //ringRingNeo(true, cntr);
-                            playAudibleAlarm(false,
+                            playAudibleAlarm(true,
                                 activeAls.ElementAt(cntr).soundBite, cntr);
                         }
                     }
@@ -778,14 +766,6 @@ namespace DamosAlarmsNTimers
                 if (tickDebugging && (cntr == 0)) {
                     Console.WriteLine("Timer Tick");
                 }
-                
-                /*if (!chklstTimers.GetItemChecked(cntr)) {
-                    if (tickDebugging) {
-                        Console.WriteLine("Non-Active Timer #" +
-                            cntr.ToString() + " being unset");
-                    }
-                    unsetItem(cntr, false);
-                }*/
 
                 if (chklstTimers.GetItemChecked(cntr)) {
                     Console.WriteLine("Checked: " + cntr);
@@ -802,10 +782,6 @@ namespace DamosAlarmsNTimers
                         if (!activeTms.ElementAt(cntr).getHasRung()) {
                             activeTms.ElementAt(cntr).setHasRung();
 
-                            /*if (anyRunning(false, true)) {
-                                tmrOneSec.Enabled = false;
-                                tmrOneSec.Stop();
-                            }*/
                             playAudibleAlarm(false,
                                 activeTms.ElementAt(cntr).soundBite, cntr);
                         }
