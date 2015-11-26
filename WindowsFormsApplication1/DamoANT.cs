@@ -1437,11 +1437,15 @@ namespace DamosAlarmsNTimers
                     Console.Write(ndx + " ");
                 }
 
-                activeTms.ElementAt(ndx).setOrigInterval(
-                    activeTms.ElementAt(ndx).getInterval());
+                TimeSpan origInterval = 
+                    activeTms.ElementAt(ndx).getOrigInterval();
+                activeTms.ElementAt(ndx).setInterval(
+                    origInterval.Hours, origInterval.Minutes, 
+                    origInterval.Seconds);
+
                 activeTms.ElementAt(ndx).setRunning(false);
                 chklstTimers.SetItemCheckState(ndx, 
-                    CheckState.Unchecked);
+                    CheckState.Unchecked );
             }
 
             if (timerDebugging) {
