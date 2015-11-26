@@ -57,6 +57,7 @@
             this.lblTimers = new System.Windows.Forms.Label();
             this.tmrOneSec = new System.Windows.Forms.Timer(this.components);
             this.openSoundFile = new System.Windows.Forms.OpenFileDialog();
+            this.btnResetTimer = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -93,6 +94,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.btnResetTimer);
             this.splitContainer1.Panel2.Controls.Add(this.btnEditTimer);
             this.splitContainer1.Panel2.Controls.Add(this.lblWipeTimer);
             this.splitContainer1.Panel2.Controls.Add(this.btnToastTimer);
@@ -383,6 +385,16 @@
             this.openSoundFile.FileName = "openFileDialog1";
             this.openSoundFile.Title = "Alarm/Timer Notification Sound";
             // 
+            // btnResetTimer
+            // 
+            this.btnResetTimer.Location = new System.Drawing.Point(95, 328);
+            this.btnResetTimer.Name = "btnResetTimer";
+            this.btnResetTimer.Size = new System.Drawing.Size(75, 23);
+            this.btnResetTimer.TabIndex = 15;
+            this.btnResetTimer.Text = "Reset Timer";
+            this.btnResetTimer.UseVisualStyleBackColor = true;
+            this.btnResetTimer.Click += new System.EventHandler(this.btnResetTimer_Click);
+            // 
             // frmDamoANTs
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -437,6 +449,7 @@
         private System.Windows.Forms.Button btnEditTimer;
         public System.Windows.Forms.CheckedListBox chklstTimers;
         private System.Windows.Forms.Button btnGetHelp;
+        private System.Windows.Forms.Button btnResetTimer;
     }
 }
 

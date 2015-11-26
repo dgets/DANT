@@ -1426,6 +1426,28 @@ namespace DamosAlarmsNTimers
                 }
             }
         }
+
+        private void btnResetTimer_Click(object sender, EventArgs e) {
+            if (timerDebugging) {
+                Console.Write("Entered btnResetTimer_Click\nResetting: ");
+            }
+            
+            foreach (int ndx in chklstTimers.CheckedIndices) {
+                if (timerDebugging) {
+                    Console.Write(ndx + " ");
+                }
+
+                activeTms.ElementAt(ndx).setOrigInterval(
+                    activeTms.ElementAt(ndx).getInterval());
+                activeTms.ElementAt(ndx).setRunning(false);
+                chklstTimers.SetItemCheckState(ndx, 
+                    CheckState.Unchecked);
+            }
+
+            if (timerDebugging) {
+                Console.Write("\n");
+            }
+        }
     }
     
     public class DANTException : ApplicationException {
