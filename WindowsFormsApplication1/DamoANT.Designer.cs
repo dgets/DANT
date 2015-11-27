@@ -135,9 +135,9 @@
             this.lblWipeAlarm.AutoSize = true;
             this.lblWipeAlarm.Location = new System.Drawing.Point(9, 359);
             this.lblWipeAlarm.Name = "lblWipeAlarm";
-            this.lblWipeAlarm.Size = new System.Drawing.Size(78, 13);
+            this.lblWipeAlarm.Size = new System.Drawing.Size(77, 13);
             this.lblWipeAlarm.TabIndex = 1;
-            this.lblWipeAlarm.Text = "Check first and";
+            this.lblWipeAlarm.Text = "Select first and";
             // 
             // btnToastAlarm
             // 
@@ -229,7 +229,6 @@
             // 
             // chklstAlarms
             // 
-            this.chklstAlarms.CheckOnClick = true;
             this.chklstAlarms.FormattingEnabled = true;
             this.chklstAlarms.Location = new System.Drawing.Point(12, 56);
             this.chklstAlarms.Name = "chklstAlarms";
@@ -262,9 +261,9 @@
             this.lblWipeTimer.AutoSize = true;
             this.lblWipeTimer.Location = new System.Drawing.Point(8, 359);
             this.lblWipeTimer.Name = "lblWipeTimer";
-            this.lblWipeTimer.Size = new System.Drawing.Size(78, 13);
+            this.lblWipeTimer.Size = new System.Drawing.Size(77, 13);
             this.lblWipeTimer.TabIndex = 13;
-            this.lblWipeTimer.Text = "Check first and";
+            this.lblWipeTimer.Text = "Select first and";
             // 
             // btnToastTimer
             // 
@@ -356,7 +355,6 @@
             // 
             // chklstTimers
             // 
-            this.chklstTimers.CheckOnClick = true;
             this.chklstTimers.FormattingEnabled = true;
             this.chklstTimers.Location = new System.Drawing.Point(11, 56);
             this.chklstTimers.Name = "chklstTimers";

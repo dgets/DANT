@@ -1068,7 +1068,23 @@ namespace DamosAlarmsNTimers
          * removes all necessary List/checklist items
          */
         private void btnToastAlarm_Click(object sender, EventArgs e) {
-            foreach (int ndx in chklstAlarms.CheckedIndices) {
+            int ndx = chklstAlarms.SelectedIndex;
+
+            if (activeAls[ndx].getRunning()) {
+                activeAls[ndx].toggleRunning();
+            }
+            chklstAlarms.Items.RemoveAt(ndx);
+            activeAls.RemoveAt(ndx);
+            try {
+                saveAlarmsTimers();
+            } catch {
+                if (generalDebugging) {
+                    Console.WriteLine("Error toasting alarm.");
+                    throw new DANTException("Error toasting alarm");
+                }
+            }   //there really should be more error handling
+              
+            /*foreach (int ndx in chklstAlarms.CheckedIndices) {
                 //need to add code in here to stop timer from ticking if
                 //necessary (if this was the only active alarm/timer)
                 if (activeAls[ndx].getRunning()) {
@@ -1084,7 +1100,7 @@ namespace DamosAlarmsNTimers
                         throw new DANTException("Error toasting alarm");
                     }
                 }   //there really should be more error handling
-            }
+            }*/
         }
 
         /*
@@ -1413,7 +1429,20 @@ namespace DamosAlarmsNTimers
          * properly selected
          */
         private void btnToastTimer_Click(object sender, EventArgs e) {
-            foreach (int ndx in chklstTimers.CheckedIndices) {
+            int ndx = chklstTimers.SelectedIndex;
+
+            chklstTimers.Items.RemoveAt(ndx);
+            activeTms.RemoveAt(ndx);
+            try {
+                saveAlarmsTimers();
+            } catch {
+                if (fileIODebugging) {
+                    Console.WriteLine("Error saving alarms/timers");
+                }
+                throw new DANTException("Error saving alarms/timers");
+            }
+
+            /*foreach (int ndx in chklstTimers.CheckedIndices) {
                 //need to add code in here to stop timer from ticking if nec.
                 chklstTimers.Items.RemoveAt(ndx);
                 activeTms.RemoveAt(ndx);
@@ -1425,7 +1454,7 @@ namespace DamosAlarmsNTimers
                     }
                     throw new DANTException("Error saving alarms/timers");
                 }
-            }
+            }*/
         }
 
         /*
