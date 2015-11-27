@@ -17,6 +17,8 @@ namespace DamosAlarmsNTimers {
     public partial class frmEditWindow : Form {
 
         private frmDamoANTs primaryWindow = null;
+        private const Boolean editDebugging = false;
+
         int ndx;
         Boolean alOrTm;
 
@@ -25,10 +27,26 @@ namespace DamosAlarmsNTimers {
 
             primaryWindow = pf;
 
+            if (editDebugging) {
+                Console.WriteLine("Debugging in Edit window");
+            }
+
             if (alarm) {
                 alOrTm = true;
                 radioAlarmType.Checked = true;
-                ndx = pf.chklstAlarms.CheckedIndices[0];
+                ndx = pf.chklstAlarms.SelectedIndex;
+
+                if (ndx == -1) {
+                    showDispleasureAtIncompetence();
+                    return;
+                }
+
+                if (editDebugging) {
+                    Console.WriteLine("ndx: " + ndx);
+
+                    Console.WriteLine("Press a key to continue . . .");
+                    Console.ReadKey();
+                }
 
                 txtEditAlarmName.Text = pf.activeAls[ndx].name;
                 nudEditHour.Value = pf.activeAls[ndx].ringAt.Hour;
@@ -38,7 +56,12 @@ namespace DamosAlarmsNTimers {
             } else {
                 alOrTm = false;
                 radioTimerType.Checked = true;
-                ndx = pf.chklstTimers.CheckedIndices[0];
+                ndx = pf.chklstTimers.SelectedIndex;
+
+                if (ndx == -1) {
+                    showDispleasureAtIncompetence();
+                    return;
+                }
 
                 txtEditAlarmName.Text = pf.activeTms[ndx].name;
 
@@ -67,6 +90,10 @@ namespace DamosAlarmsNTimers {
                 txtShowSoundByte.Text);
             
             this.Close();
+        }
+
+        private void showDispleasureAtIncompetence() {
+            MessageBox.Show("You must have selected a valid alarm/timer");
         }
     }
 }

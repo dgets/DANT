@@ -172,6 +172,10 @@ namespace DamosAlarmsNTimers
             public void setInterval(int hrs, int min, int sec) {
                 interval = new TimeSpan(0, hrs, min, sec, 0);
             }
+            //overload for setInterval to directly take a new timespan
+            public void setInterval(TimeSpan newSpan) {
+                interval = newSpan;
+            }
             public TimeSpan getInterval() {
                 return interval;
             }
@@ -1089,7 +1093,7 @@ namespace DamosAlarmsNTimers
          * the appropriate editing form/winder
          */
         private void btnEditAlarm_Click(object sender, EventArgs e) {
-            if (chklstAlarms.CheckedIndices.Count == 0) {
+            /*if (chklstAlarms.CheckedIndices.Count == 0) {
                 //this should be changed as having something be running in
                 //order to edit it is just drop dead stoopid
                 MessageBox.Show("You must check an alarm before trying to " +
@@ -1103,6 +1107,20 @@ namespace DamosAlarmsNTimers
                 editWindow = new frmEditWindow(this, true);
                 editWindow.Show();
 
+            }*/
+
+            //trying out selection-based editing to avoid some confusion
+            if (chklstAlarms.SelectedIndex == -1) {
+                MessageBox.Show("You must select an alarm before trying to " +
+                    "edit it!");
+            } else {
+                if (anyRunning(false, true)) {
+                    tmrOneSec.Enabled = false;
+                    tmrOneSec.Stop();
+                }
+
+                editWindow = new frmEditWindow(this, true);
+                editWindow.Show();
             }
         }
 
@@ -1201,23 +1219,6 @@ namespace DamosAlarmsNTimers
 
             return targetZeroesAdded;
         }
-
-        /*
-         * Method handles adding new timer data to the appropriate List
-         * objects and checklist
-         * 
-         * NOTE: Currently depreciated
-         */
-        /*private void btnAddTimer_Click(object sender, EventArgs e) {
-            if (txtTimerName.Text.CompareTo("") == 0) {
-                MessageBox.Show("You must enter a timer name!",
-                    "Timer Name Required");
-            }
-            if (!legitTime((int)numTimerHr.Value, (int)numTimerMin.Value,
-                                (int)numTimerSec.Value, false)) {
-                throw new DANTException("Not legit time from legitTime()\n");
-            }
-        } */
 
         /*
          * Method handles adding new timer data to the appropriate List
@@ -1392,7 +1393,7 @@ namespace DamosAlarmsNTimers
          * the appropriate form/winder to edit the data if necessary
          */
         private void btnEditTimer_Click(object sender, EventArgs e) {
-            if (chklstTimers.CheckedIndices.Count == 0) {
+            if (chklstTimers.SelectedIndex == -1) {
                 MessageBox.Show("You must check a timer before trying to " +
                     "edit it!");
             } else {
@@ -1427,6 +1428,9 @@ namespace DamosAlarmsNTimers
             }
         }
 
+        /*
+         * method is used to reset timer to its original interval
+         */
         private void btnResetTimer_Click(object sender, EventArgs e) {
             if (timerDebugging) {
                 Console.Write("Entered btnResetTimer_Click\nResetting: ");
@@ -1437,15 +1441,17 @@ namespace DamosAlarmsNTimers
                     Console.Write(ndx + " ");
                 }
 
-                TimeSpan origInterval = 
+                /*TimeSpan origInterval = 
                     activeTms.ElementAt(ndx).getOrigInterval();
                 activeTms.ElementAt(ndx).setInterval(
                     origInterval.Hours, origInterval.Minutes, 
-                    origInterval.Seconds);
+                    origInterval.Seconds);*/
+                activeTms.ElementAt(ndx).setInterval(
+                    activeTms.ElementAt(ndx).getOrigInterval());
 
                 activeTms.ElementAt(ndx).setRunning(false);
                 chklstTimers.SetItemCheckState(ndx, 
-                    CheckState.Unchecked );
+                    CheckState.Unchecked);
             }
 
             if (timerDebugging) {
