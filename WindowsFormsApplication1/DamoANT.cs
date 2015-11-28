@@ -701,18 +701,32 @@ namespace DamosAlarmsNTimers
          * checklist while counting down
          */
         private void updateDisplay(int ndx, Boolean alarm) {
+            Boolean isSelected = false;
+
             if (alarm) {
+                if (chklstAlarms.SelectedIndex == ndx) {
+                    isSelected = true;
+                }
                 chklstAlarms.Items.RemoveAt(ndx);
                 chklstAlarms.Items.Insert(ndx,
                     activeAls.ElementAt(ndx).name + ": Remaining: " +
                     returnCountdown(activeAls.ElementAt(ndx).getInterval()));
                 chklstAlarms.SetItemChecked(ndx, true);
+                if (isSelected) {
+                    chklstAlarms.SelectedIndex = ndx;
+                }
             } else {
+                if (chklstTimers.SelectedIndex == ndx) {
+                    isSelected = true;
+                }
                 chklstTimers.Items.RemoveAt(ndx);
                 chklstTimers.Items.Insert(ndx,
                     activeTms.ElementAt(ndx).name + ": Remaining: " +
                     returnCountdown(activeTms.ElementAt(ndx).getInterval()));
                 chklstTimers.SetItemChecked(ndx, true);
+                if (isSelected) {
+                    chklstTimers.SelectedIndex = ndx;
+                }
             }
         }
 
