@@ -892,10 +892,7 @@ namespace DamosAlarmsNTimers
          */
         private void ringRingNeo(Boolean alarm, int ndx) {
             if (alarm) {
-                MessageBox.Show(activeAls.ElementAt(ndx).name +
-                    ": -+=* Ring ring, Neo *=+-",
-                    activeAls.ElementAt(ndx).name + " Firing",
-                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
                 chklstAlarms.Items.RemoveAt(ndx);
                 addAlarm(ndx);
 
@@ -904,11 +901,12 @@ namespace DamosAlarmsNTimers
                 chklstAlarms.Items.Insert(ndx,
                     activeAls.ElementAt(ndx).name + " -+=* RING " +
                     " RING *=+-");
-            } else {
-                MessageBox.Show(activeTms.ElementAt(ndx).name +
+
+                MessageBox.Show(activeAls.ElementAt(ndx).name +
                     ": -+=* Ring ring, Neo *=+-",
-                    activeTms.ElementAt(ndx).name + " Firing",
+                    activeAls.ElementAt(ndx).name + " Firing",
                     MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            } else {
                 chklstTimers.Items.RemoveAt(ndx);
                 addTimer(ndx);
 
@@ -917,6 +915,12 @@ namespace DamosAlarmsNTimers
                 chklstTimers.Items.Insert(ndx,
                     activeTms.ElementAt(ndx).name + " -+=* RING " +
                     " RING *=+-");
+
+                MessageBox.Show(activeTms.ElementAt(ndx).name +
+                    ": -+=* Ring ring, Neo *=+-",
+                    activeTms.ElementAt(ndx).name + " Firing",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
             }
         }
 
