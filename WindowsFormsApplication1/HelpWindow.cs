@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace DamosAlarmsNTimers {
     public partial class frmHelp : Form {
-        private frmDamoANTs primaryWindow;
+        private frmDamoANTs primaryWindow = null;
 
         public frmHelp(frmDamoANTs pf) {
             InitializeComponent();
@@ -20,5 +20,6 @@ namespace DamosAlarmsNTimers {
         private void btnCloseHelp_Click(object sender, EventArgs e) {
             this.Close();
         }
+
     }
 }

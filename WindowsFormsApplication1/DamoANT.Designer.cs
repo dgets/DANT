@@ -119,6 +119,7 @@
             this.btnGetHelp.TabIndex = 1;
             this.btnGetHelp.Text = "General Help";
             this.btnGetHelp.UseVisualStyleBackColor = true;
+            this.btnGetHelp.Click += new System.EventHandler(this.btnGetHelp_Click);
             // 
             // btnEditAlarm
             // 

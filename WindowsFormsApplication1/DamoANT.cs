@@ -1460,19 +1460,6 @@ namespace DamosAlarmsNTimers
                 throw new DANTException("Error saving alarms/timers");
             }
 
-            /*foreach (int ndx in chklstTimers.CheckedIndices) {
-                //need to add code in here to stop timer from ticking if nec.
-                chklstTimers.Items.RemoveAt(ndx);
-                activeTms.RemoveAt(ndx);
-                try {
-                    saveAlarmsTimers();
-                } catch {
-                    if (fileIODebugging) {
-                        Console.WriteLine("Error saving alarms/timers\n");
-                    }
-                    throw new DANTException("Error saving alarms/timers");
-                }
-            }*/
         }
 
         /*
@@ -1488,11 +1475,6 @@ namespace DamosAlarmsNTimers
                     Console.Write(ndx + " ");
                 }
 
-                /*TimeSpan origInterval = 
-                    activeTms.ElementAt(ndx).getOrigInterval();
-                activeTms.ElementAt(ndx).setInterval(
-                    origInterval.Hours, origInterval.Minutes, 
-                    origInterval.Seconds);*/
                 activeTms.ElementAt(ndx).setInterval(
                     activeTms.ElementAt(ndx).getOrigInterval());
 
@@ -1505,6 +1487,7 @@ namespace DamosAlarmsNTimers
                 Console.Write("\n");
             }
         }
+
     }
     
     public class DANTException : ApplicationException {

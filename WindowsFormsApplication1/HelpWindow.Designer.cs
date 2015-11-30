@@ -37,6 +37,7 @@
             this.btnCloseHelp.TabIndex = 0;
             this.btnCloseHelp.Text = "Close Help";
             this.btnCloseHelp.UseVisualStyleBackColor = true;
+            this.btnCloseHelp.Click += new System.EventHandler(this.btnCloseHelp_Click);
             // 
             // lblHelpFormHeading
             // 
