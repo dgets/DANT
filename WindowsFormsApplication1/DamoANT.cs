@@ -1101,24 +1101,7 @@ namespace DamosAlarmsNTimers
                     throw new DANTException("Error toasting alarm");
                 }
             }   //there really should be more error handling
-              
-            /*foreach (int ndx in chklstAlarms.CheckedIndices) {
-                //need to add code in here to stop timer from ticking if
-                //necessary (if this was the only active alarm/timer)
-                if (activeAls[ndx].getRunning()) {
-                    activeAls[ndx].toggleRunning();
-                }
-                chklstAlarms.Items.RemoveAt(ndx);
-                activeAls.RemoveAt(ndx);
-                try {
-                    saveAlarmsTimers();
-                } catch {
-                    if (generalDebugging) {
-                        Console.WriteLine("Error toasting alarm.");
-                        throw new DANTException("Error toasting alarm");
-                    }
-                }   //there really should be more error handling
-            }*/
+
         }
 
         /*
@@ -1127,22 +1110,6 @@ namespace DamosAlarmsNTimers
          * the appropriate editing form/winder
          */
         private void btnEditAlarm_Click(object sender, EventArgs e) {
-            /*if (chklstAlarms.CheckedIndices.Count == 0) {
-                //this should be changed as having something be running in
-                //order to edit it is just drop dead stoopid
-                MessageBox.Show("You must check an alarm before trying to " +
-                    "edit it!");
-            } else {
-                if (anyRunning(false, true)) {
-                    tmrOneSec.Enabled = false;
-                    tmrOneSec.Stop();
-                }
-
-                editWindow = new frmEditWindow(this, true);
-                editWindow.Show();
-
-            }*/
-
             //trying out selection-based editing to avoid some confusion
             if (chklstAlarms.SelectedIndex == -1) {
                 MessageBox.Show("You must select an alarm before trying to " +
@@ -1173,6 +1140,8 @@ namespace DamosAlarmsNTimers
                 activeAls[ndx].setInterval();
 
                 chklstAlarms.SetItemChecked(ndx, false);
+
+                updateDisplay(ndx, true);
             } else {
                 activeTms[ndx].name = an;
                 activeTms[ndx].setOrigInterval(new TimeSpan(hr, min, sec));
@@ -1180,6 +1149,8 @@ namespace DamosAlarmsNTimers
                 activeTms[ndx].setRunning(false);
                 activeTms[ndx].setInterval(hr, min, sec);
                 chklstTimers.SetItemChecked(ndx, false);
+
+                updateDisplay(ndx, false);
             }
 
             try {
@@ -1466,11 +1437,13 @@ namespace DamosAlarmsNTimers
          * method is used to reset timer to its original interval
          */
         private void btnResetTimer_Click(object sender, EventArgs e) {
+            //Boolean foundAny = false;
+            
             if (timerDebugging) {
                 Console.Write("Entered btnResetTimer_Click\nResetting: ");
             }
             
-            foreach (int ndx in chklstTimers.CheckedIndices) {
+            /*foreach (int ndx in chklstTimers.CheckedIndices) {
                 if (timerDebugging) {
                     Console.Write(ndx + " ");
                 }
@@ -1481,11 +1454,23 @@ namespace DamosAlarmsNTimers
                 activeTms.ElementAt(ndx).setRunning(false);
                 chklstTimers.SetItemCheckState(ndx, 
                     CheckState.Unchecked);
+
+                foundAny = true;
+            }*/
+
+            int ndx = chklstTimers.SelectedIndex;
+
+            if (timerDebugging && (ndx != -1)) {
+                Console.WriteLine(ndx + " ");
+
+                activeTms.ElementAt(ndx).setInterval(
+                    activeTms.ElementAt(ndx).getOrigInterval());
+                activeTms.ElementAt(ndx).setRunning(false);
+                chklstTimers.SetItemCheckState(ndx, CheckState.Unchecked);
+            } else if (timerDebugging) {
+                Console.WriteLine("Nothing, apparently");
             }
 
-            if (timerDebugging) {
-                Console.Write("\n");
-            }
         }
 
     }
