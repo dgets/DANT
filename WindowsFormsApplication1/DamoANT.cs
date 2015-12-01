@@ -744,10 +744,14 @@ namespace DamosAlarmsNTimers
          * countdown procedure and testing for firing for all alarms
          */
         private void tickDoAlarms() {
+            int selected = -1;
+
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
                 if (tickDebugging && (cntr == 0)) {
                     Console.WriteLine("Alarm Tick");
                 }
+
+                selected = chklstAlarms.SelectedIndex;
 
                 if (chklstAlarms.GetItemChecked(cntr)) {
                     if (tickDebugging) {
@@ -772,6 +776,10 @@ namespace DamosAlarmsNTimers
                 } else {
                     unsetItem(cntr, true);
                 }
+
+                if (selected != -1) { 
+                    chklstAlarms.SetSelected(selected, true);
+                }
             }
         }
 
@@ -780,10 +788,14 @@ namespace DamosAlarmsNTimers
          * countdown procedure and testing for firing for all timers
          */
         private void tickDoTimers() {
+            int selected = -1;
+
             for (int cntr = 0; cntr < activeTms.Count; cntr++) {
                 if (tickDebugging && (cntr == 0)) {
                     Console.WriteLine("Timer Tick");
                 }
+
+                selected = chklstTimers.SelectedIndex;
 
                 if (chklstTimers.GetItemChecked(cntr)) {
                     Console.WriteLine("Checked: " + cntr);
@@ -811,6 +823,10 @@ namespace DamosAlarmsNTimers
                     }
                 } else {
                     unsetItem(cntr, false);
+                }
+
+                if (selected != -1) { 
+                    chklstTimers.SetSelected(selected, true);
                 }
             }
         }
@@ -1442,21 +1458,6 @@ namespace DamosAlarmsNTimers
             if (timerDebugging) {
                 Console.Write("Entered btnResetTimer_Click\nResetting: ");
             }
-            
-            /*foreach (int ndx in chklstTimers.CheckedIndices) {
-                if (timerDebugging) {
-                    Console.Write(ndx + " ");
-                }
-
-                activeTms.ElementAt(ndx).setInterval(
-                    activeTms.ElementAt(ndx).getOrigInterval());
-
-                activeTms.ElementAt(ndx).setRunning(false);
-                chklstTimers.SetItemCheckState(ndx, 
-                    CheckState.Unchecked);
-
-                foundAny = true;
-            }*/
 
             int ndx = chklstTimers.SelectedIndex;
 
