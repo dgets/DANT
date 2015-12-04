@@ -919,6 +919,9 @@ namespace DamosAlarmsNTimers
                     activeTms.ElementAt(ndx).name + " -+=* RING " +
                     " RING *=+-");
 
+                activeTms.ElementAt(ndx).setInterval(
+                    activeTms.ElementAt(ndx).getOrigInterval());
+
                 MessageBox.Show(activeTms.ElementAt(ndx).name +
                     ": -+=* Ring ring, Neo *=+-",
                     activeTms.ElementAt(ndx).name + " Firing",
