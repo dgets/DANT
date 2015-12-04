@@ -235,6 +235,14 @@ namespace DamosAlarmsNTimers
         }
 
         /*
+         * trying to override default behavior to separate selection and
+         * checkbox being tied to the same mouse events
+         */
+        /*private class my_ListBox : ListBox {
+            
+        }*/
+
+        /*
          * Method returns the countdown for either alarm or timer
          * (part of modularizing)
          */
@@ -588,7 +596,7 @@ namespace DamosAlarmsNTimers
                         "detected");
                 }
                 return true;    //not an error condition
-            } else { return false; }
+            } else { return false; }    //using exceptions here = better
         }
 
         /*
@@ -627,26 +635,9 @@ namespace DamosAlarmsNTimers
             ouah = convertSavedFields(fields);
             tmp.setInterval(ouah[0], ouah[1], ouah[2]);
 
-            //this should be changed to include tryParse, perhaps, and throw
-            //an exception if something bogus is added
-            /*try {
-                for (int guh = 0; guh < 3; guh++) {
-                    if (fileIODebugging) {
-                        Console.WriteLine("Field " + (guh + 2) + ": " + 
-                            fields[guh + 2]);
-                    }
-                    ouah[guh] = int.Parse(fields[guh + 2]);
-                }
-            } catch {
-                throw new DANTException(
-                    "Unable to parse fields for tmpTimer");
-            }*/
-            //we now need this in 'interval', also, as that one will be used
-            //for counting down
             //in hindsight, these should both be set by TimeSpan, not one by
             //such and the other by 3 integers :P
             tmp.setOrigInterval(new TimeSpan(ouah[0], ouah[1], ouah[2]));
-            //tmp.setInterval(ouah[0], ouah[1], ouah[2]);
 
             return tmp;
         }
@@ -744,14 +735,12 @@ namespace DamosAlarmsNTimers
          * countdown procedure and testing for firing for all alarms
          */
         private void tickDoAlarms() {
-            int selected = -1;
+            int selected = chklstAlarms.SelectedIndex;
 
             for (int cntr = 0; cntr < activeAls.Count; cntr++) {
                 if (tickDebugging && (cntr == 0)) {
                     Console.WriteLine("Alarm Tick");
                 }
-
-                selected = chklstAlarms.SelectedIndex;
 
                 if (chklstAlarms.GetItemChecked(cntr)) {
                     if (tickDebugging) {
@@ -788,14 +777,12 @@ namespace DamosAlarmsNTimers
          * countdown procedure and testing for firing for all timers
          */
         private void tickDoTimers() {
-            int selected = -1;
+            int selected = chklstTimers.SelectedIndex;
 
             for (int cntr = 0; cntr < activeTms.Count; cntr++) {
                 if (tickDebugging && (cntr == 0)) {
                     Console.WriteLine("Timer Tick");
                 }
-
-                selected = chklstTimers.SelectedIndex;
 
                 if (chklstTimers.GetItemChecked(cntr)) {
                     Console.WriteLine("Checked: " + cntr);
@@ -1024,10 +1011,14 @@ namespace DamosAlarmsNTimers
                 Console.WriteLine("Firing chklstAlarms_Clicked");
             }
 
-            if ((!anyRunning(false, true)) && (tmrOneSec.Enabled == true)) {
+            /*if ((!anyRunning(false, true)) && (tmrOneSec.Enabled == true)) {
                 //turn the timer off, por dios
                 tmrOneSec.Stop();
                 tmrOneSec.Enabled = false;
+                return;
+            }*/
+
+            if (chklstAlarms.CheckedIndices.Count == 0) {
                 return;
             }
 
@@ -1131,10 +1122,10 @@ namespace DamosAlarmsNTimers
                 MessageBox.Show("You must select an alarm before trying to " +
                     "edit it!");
             } else {
-                if (anyRunning(false, true)) {
+                /*if (anyRunning(false, true)) {
                     tmrOneSec.Enabled = false;
                     tmrOneSec.Stop();
-                }
+                }*/     //maybe make this shit user configurable at some point
 
                 editWindow = new frmEditWindow(this, true);
                 editWindow.Show();
@@ -1355,10 +1346,13 @@ namespace DamosAlarmsNTimers
                 Console.WriteLine("Firing chklstTimers_Clicked");
             }
 
-            if (!anyRunning(false, true) && (tmrOneSec.Enabled == true)) {
+            /*if (!anyRunning(false, true) && (tmrOneSec.Enabled == true)) {
                 //turn the timer off, por dios
                 tmrOneSec.Stop();
                 tmrOneSec.Enabled = false;
+                return;
+            }*/     //this should be user configurable behavior
+            if (!anyRunning(false, true)) {
                 return;
             }
 
